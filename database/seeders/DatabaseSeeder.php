@@ -15,11 +15,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+    \App\Models\User::create([
+    'nama_seksi' => 'Admin Kendaraan',
+    'username'   => 'admin',
+    'password'   => 'admin123',
+    'peran'      => 'admin',
+    ]);
+    $this->call(DataContohSeeder::class);
     }
 }
