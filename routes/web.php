@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KendaraanController;
+use App\Http\Controllers\PengemudiController;
+use App\Http\Controllers\PenggunaController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +17,7 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-//  Admin 
+// Admin
 Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard', [
@@ -29,7 +31,10 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
         ]);
     })->name('dashboard');
 
+    
     Route::resource('kendaraan', KendaraanController::class)->except('show');
+    Route::resource('pengemudi', PengemudiController::class)->except('show');
+    Route::resource('pengguna', PenggunaController::class)->except('show');
 });
 
 // Pegawai

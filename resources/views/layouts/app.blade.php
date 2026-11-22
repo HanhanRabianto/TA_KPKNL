@@ -58,6 +58,8 @@
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'on' : '' }}">Dashboard</a>
                 <div class="grp">Data</div>
                 <a href="{{ route('admin.kendaraan.index') }}" class="{{ request()->routeIs('admin.kendaraan.*') ? 'on' : '' }}">Kendaraan</a>
+                <a href="{{ route('admin.pengemudi.index') }}" class="{{ request()->routeIs('admin.pengemudi.*') ? 'on' : '' }}">Pengemudi</a>
+                <a href="{{ route('admin.pengguna.index') }}" class="{{ request()->routeIs('admin.pengguna.*') ? 'on' : '' }}">Pengguna</a>
             </aside>
         @endif
         <main>
