@@ -1,13 +1,16 @@
 <?php
 
+use App\Http\Controllers\Admin\VerifikasiPeminjamanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KendaraanController;
+use App\Http\Controllers\Pegawai\PeminjamanController;
 use App\Http\Controllers\PengemudiController;
 use App\Http\Controllers\PenggunaController;
+use App\Models\Peminjaman;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-
+// Halaman utama: mengarahkan sesuai peran (belum login -> halaman login)
 Route::get('/', [AuthController::class, 'arah'])->middleware('auth')->name('home');
 
 Route::middleware('guest')->group(function () {
@@ -17,19 +20,27 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-// Admin
+// ---------------- Admin ----------------
 Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard', [
-            'totalKendaraan' => DB::table('kendaraan')->count(),
-            'tersedia'       => DB::table('kendaraan')->where('status', 'Tersedia')->count(),
-            'dipakai'        => DB::table('kendaraan')->where('status', 'Sedang dipakai')->count(),
-            'diservis'       => DB::table('kendaraan')->where('status', 'Sedang diservis')->count(),
-            'totalPengemudi' => DB::table('pengemudi')->count(),
-            'pengemudiSedia' => DB::table('pengemudi')->where('status', 'Tersedia')->count(),
-            'totalSeksi'     => DB::table('pengguna')->where('peran', 'pegawai')->count(),
+            'totalKendaraan'   => DB::table('kendaraan')->count(),
+            'tersedia'         => DB::table('kendaraan')->where('status', 'Tersedia')->count(),
+            'dipakai'          => DB::table('kendaraan')->where('status', 'Sedang dipakai')->count(),
+            'diservis'         => DB::table('kendaraan')->where('status', 'Sedang diservis')->count(),
+            'totalPengemudi'   => DB::table('pengemudi')->count(),
+            'pengemudiSedia'   => DB::table('pengemudi')->where('status', 'Tersedia')->count(),
+            'totalSeksi'       => DB::table('pengguna')->where('peran', 'pegawai')->count(),
+            'pengajuanMenunggu' => Peminjaman::where('status', 'menunggu')->count(),
         ]);
     })->name('dashboard');
+
+    
+    Route::get('/peminjaman', [VerifikasiPeminjamanController::class, 'index'])->name('peminjaman.index');
+    Route::get('/peminjaman/{peminjaman}/setujui', [VerifikasiPeminjamanController::class, 'formSetujui'])->name('peminjaman.setujui');
+    Route::post('/peminjaman/{peminjaman}/setujui', [VerifikasiPeminjamanController::class, 'setujui']);
+    Route::get('/peminjaman/{peminjaman}/tolak', [VerifikasiPeminjamanController::class, 'formTolak'])->name('peminjaman.tolak');
+    Route::post('/peminjaman/{peminjaman}/tolak', [VerifikasiPeminjamanController::class, 'tolak']);
 
     
     Route::resource('kendaraan', KendaraanController::class)->except('show');
@@ -37,7 +48,21 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     Route::resource('pengguna', PenggunaController::class)->except('show');
 });
 
-// Pegawai
+// ---------------- Pegawai ----------------
 Route::middleware(['auth', 'peran:pegawai'])->prefix('pegawai')->name('pegawai.')->group(function () {
-    Route::get('/beranda', fn () => view('pegawai.beranda'))->name('beranda');
+    Route::get('/beranda', function () {
+        $uid = auth()->id();
+
+        return view('pegawai.beranda', [
+            'aktif'   => Peminjaman::jumlahAktif($uid),
+            'maks'    => Peminjaman::MAKS_AKTIF,
+            'blokir'  => Peminjaman::alasanBlokir($uid),
+            'menunggu' => Peminjaman::where('pengguna_id', $uid)->where('status', 'menunggu')->count(),
+            'selesai' => Peminjaman::where('pengguna_id', $uid)->where('status', 'selesai')->count(),
+        ]);
+    })->name('beranda');
+
+    Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.index');
+    Route::get('/peminjaman/buat', [PeminjamanController::class, 'create'])->name('peminjaman.create');
+    Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
 });

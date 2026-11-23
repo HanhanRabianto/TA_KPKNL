@@ -36,6 +36,8 @@
         .flash { padding:10px 12px; border-radius:8px; margin-bottom:14px; }
         .flash.ok { background:var(--okb); color:var(--ok); } .flash.err { background:var(--erb); color:var(--er); }
         label { display:block; font-size:12px; color:var(--mu); margin:12px 0 4px; }
+        textarea { width:100%; padding:9px; border:1px solid var(--bd); border-radius:8px; font:inherit; background:#fff; }
+        .tabs { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
         input, select { width:100%; padding:9px; border:1px solid var(--bd); border-radius:8px; font:inherit; background:#fff; }
         input[readonly] { background:#eef1f6; color:var(--mu); }
         .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0 14px; }
@@ -53,15 +55,27 @@
         </form>
     </header>
     <div class="wrap">
-        @if (auth()->user()->peran === 'admin')
-            <aside>
+        @php
+            $adalahAdmin = auth()->user()->peran === 'admin';
+            $nMenunggu = $adalahAdmin ? \App\Models\Peminjaman::where('status', 'menunggu')->count() : 0;
+        @endphp
+        <aside>
+            @if ($adalahAdmin)
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'on' : '' }}">Dashboard</a>
+                <a href="{{ route('admin.peminjaman.index') }}" class="{{ request()->routeIs('admin.peminjaman.*') ? 'on' : '' }}">
+                    Verifikasi Pinjaman
+                    @if ($nMenunggu) <span class="b er" style="float:right">{{ $nMenunggu }}</span> @endif
+                </a>
                 <div class="grp">Data</div>
                 <a href="{{ route('admin.kendaraan.index') }}" class="{{ request()->routeIs('admin.kendaraan.*') ? 'on' : '' }}">Kendaraan</a>
                 <a href="{{ route('admin.pengemudi.index') }}" class="{{ request()->routeIs('admin.pengemudi.*') ? 'on' : '' }}">Pengemudi</a>
                 <a href="{{ route('admin.pengguna.index') }}" class="{{ request()->routeIs('admin.pengguna.*') ? 'on' : '' }}">Pengguna</a>
-            </aside>
-        @endif
+            @else
+                <a href="{{ route('pegawai.beranda') }}" class="{{ request()->routeIs('pegawai.beranda') ? 'on' : '' }}">Beranda</a>
+                <a href="{{ route('pegawai.peminjaman.create') }}" class="{{ request()->routeIs('pegawai.peminjaman.create') ? 'on' : '' }}">Ajukan Pinjaman</a>
+                <a href="{{ route('pegawai.peminjaman.index') }}" class="{{ request()->routeIs('pegawai.peminjaman.index') ? 'on' : '' }}">Riwayat Pinjaman</a>
+            @endif
+        </aside>
         <main>
             @if (session('ok')) <div class="flash ok">{{ session('ok') }}</div> @endif
             @if (session('err')) <div class="flash err">{{ session('err') }}</div> @endif

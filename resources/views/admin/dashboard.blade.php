@@ -4,6 +4,15 @@
 @section('isi')
     <h2>Dashboard Admin</h2>
 
+    <h3>Peminjaman</h3>
+    <div class="grid">
+        <div class="card">
+            <div class="num">{{ $pengajuanMenunggu }}</div>
+            <div class="lbl">Pengajuan menunggu verifikasi</div>
+            @if ($pengajuanMenunggu)<a class="btn" style="margin-top:8px" href="{{ route('admin.peminjaman.index') }}">Verifikasi</a>@endif
+        </div>
+    </div>
+
     <h3>Kendaraan</h3>
     <div class="grid">
         <div class="card"><div class="num">{{ $totalKendaraan }}</div><div class="lbl">Kendaraan</div></div>
