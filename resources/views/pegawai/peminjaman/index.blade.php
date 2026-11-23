@@ -38,6 +38,13 @@
                                 {{ $p->kendaraan?->plat }} - {{ $p->kendaraan?->jenis }}<br>
                                 <span class="note">Pengemudi: {{ $p->pengemudi?->nama ?? 'tanpa pengemudi' }}</span><br>
                                 <span class="note">Surat tugas: {{ $p->nomor_surat }}</span>
+                                @if ($p->status === 'disetujui')
+                                    <br><a class="btn" style="margin-top:6px" href="{{ route('pegawai.pengembalian.create', $p) }}">Pengembalian</a>
+                                @elseif ($p->status === 'kembali_ditolak')
+                                    <br><a class="btn d" style="margin-top:6px" href="{{ route('pegawai.pengembalian.create', $p) }}">Perbaiki &amp; ajukan kembali</a>
+                                @elseif ($p->status === 'verifikasi')
+                                    <br><span class="note">Laporan pengembalian menunggu verifikasi</span>
+                                @endif
                             @endif
                         </td>
                     </tr>

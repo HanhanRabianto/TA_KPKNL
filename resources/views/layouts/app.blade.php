@@ -58,6 +58,7 @@
         @php
             $adalahAdmin = auth()->user()->peran === 'admin';
             $nMenunggu = $adalahAdmin ? \App\Models\Peminjaman::where('status', 'menunggu')->count() : 0;
+            $nKembali = $adalahAdmin ? \App\Models\Pengembalian::where('status', 'menunggu')->count() : 0;
         @endphp
         <aside>
             @if ($adalahAdmin)
@@ -65,6 +66,10 @@
                 <a href="{{ route('admin.peminjaman.index') }}" class="{{ request()->routeIs('admin.peminjaman.*') ? 'on' : '' }}">
                     Verifikasi Pinjaman
                     @if ($nMenunggu) <span class="b er" style="float:right">{{ $nMenunggu }}</span> @endif
+                </a>
+                <a href="{{ route('admin.pengembalian.index') }}" class="{{ request()->routeIs('admin.pengembalian.*') ? 'on' : '' }}">
+                    Verifikasi Pengembalian
+                    @if ($nKembali) <span class="b er" style="float:right">{{ $nKembali }}</span> @endif
                 </a>
                 <div class="grp">Data</div>
                 <a href="{{ route('admin.kendaraan.index') }}" class="{{ request()->routeIs('admin.kendaraan.*') ? 'on' : '' }}">Kendaraan</a>
@@ -74,6 +79,7 @@
                 <a href="{{ route('pegawai.beranda') }}" class="{{ request()->routeIs('pegawai.beranda') ? 'on' : '' }}">Beranda</a>
                 <a href="{{ route('pegawai.peminjaman.create') }}" class="{{ request()->routeIs('pegawai.peminjaman.create') ? 'on' : '' }}">Ajukan Pinjaman</a>
                 <a href="{{ route('pegawai.peminjaman.index') }}" class="{{ request()->routeIs('pegawai.peminjaman.index') ? 'on' : '' }}">Riwayat Pinjaman</a>
+                <a href="{{ route('pegawai.pengembalian.index') }}" class="{{ request()->routeIs('pegawai.pengembalian.*') ? 'on' : '' }}">Riwayat Pengembalian</a>
             @endif
         </aside>
         <main>

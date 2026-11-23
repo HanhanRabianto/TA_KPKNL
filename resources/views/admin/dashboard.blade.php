@@ -11,6 +11,11 @@
             <div class="lbl">Pengajuan menunggu verifikasi</div>
             @if ($pengajuanMenunggu)<a class="btn" style="margin-top:8px" href="{{ route('admin.peminjaman.index') }}">Verifikasi</a>@endif
         </div>
+        <div class="card">
+            <div class="num">{{ $pengembalianMenunggu }}</div>
+            <div class="lbl">Persetujuan pengembalian</div>
+            @if ($pengembalianMenunggu)<a class="btn" style="margin-top:8px" href="{{ route('admin.pengembalian.index') }}">Verifikasi</a>@endif
+        </div>
     </div>
 
     <h3>Kendaraan</h3>

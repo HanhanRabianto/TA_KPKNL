@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Peminjaman extends Model
 {
@@ -50,7 +51,12 @@ class Peminjaman extends Model
         return $this->belongsTo(Pengemudi::class, 'pengemudi_id');
     }
 
-    // ---------- aturan bisnis ----------
+    public function pengembalian(): HasOne
+    {
+        return $this->hasOne(Pengembalian::class, 'peminjaman_id');
+    }
+
+    
 
     public static function jumlahAktif(int $penggunaId): int
     {
@@ -62,7 +68,7 @@ class Peminjaman extends Model
         return static::where('pengguna_id', $penggunaId)->where('status', 'kembali_ditolak')->exists();
     }
 
-    // null = boleh mengajukan; selain itu berisi alasan pemblokiran
+    
     public static function alasanBlokir(int $penggunaId): ?string
     {
         if (static::adaPengembalianDitolak($penggunaId)) {
@@ -76,7 +82,7 @@ class Peminjaman extends Model
         return null;
     }
 
-    // ---------- tampilan status ----------
+    
 
     public function getLabelStatusAttribute(): string
     {
