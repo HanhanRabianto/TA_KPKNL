@@ -35,7 +35,8 @@
                                 <span class="note">Alasan: {{ $p->alasan_tolak }}</span>
                             @else
                                 {{ $p->kendaraan?->plat }} - {{ $p->kendaraan?->jenis }}<br>
-                                <span class="note">Pengemudi: {{ $p->pengemudi?->nama ?? 'tanpa pengemudi' }} | {{ $p->nomor_surat }}</span>
+                                <span class="note">Pengemudi: {{ $p->pengemudi?->nama ?? 'tanpa pengemudi' }} | {{ $p->nomor_surat }}</span><br>
+                                <a href="{{ route('surat-tugas.show', $p) }}" target="_blank">Lihat surat tugas</a>
                             @endif
                         </td>
                     </tr>

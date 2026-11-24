@@ -40,7 +40,7 @@ class VerifikasiPengembalianController extends Controller
             $r->update(['status' => 'diterima', 'diputuskan_pada' => now()]);
             $p->update(['status' => 'selesai']);
 
-            // kendaraan kembali tersedia dan odometer diperbarui otomatis
+            
             $p->kendaraan?->update(['status' => 'Tersedia', 'odometer' => $r->odometer_akhir]);
             $p->pengemudi?->update(['status' => 'Tersedia']);
 
@@ -77,7 +77,7 @@ class VerifikasiPengembalianController extends Controller
             }
 
             $r->update(['status' => 'ditolak', 'alasan_tolak' => $data['alasan_tolak'], 'diputuskan_pada' => now()]);
-            // peminjaman kembali ke status yang memblokir pengajuan baru sampai laporan diperbaiki
+            
             $r->peminjaman()->update(['status' => 'kembali_ditolak']);
 
             return true;

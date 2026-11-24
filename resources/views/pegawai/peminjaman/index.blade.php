@@ -37,7 +37,8 @@
                             @else
                                 {{ $p->kendaraan?->plat }} - {{ $p->kendaraan?->jenis }}<br>
                                 <span class="note">Pengemudi: {{ $p->pengemudi?->nama ?? 'tanpa pengemudi' }}</span><br>
-                                <span class="note">Surat tugas: {{ $p->nomor_surat }}</span>
+                                <span class="note">Surat tugas: {{ $p->nomor_surat }}</span><br>
+                                <a class="btn s" style="margin-top:4px" href="{{ route('surat-tugas.show', $p) }}" target="_blank">Lampiran Surat Tugas</a>
                                 @if ($p->status === 'disetujui')
                                     <br><a class="btn" style="margin-top:6px" href="{{ route('pegawai.pengembalian.create', $p) }}">Pengembalian</a>
                                 @elseif ($p->status === 'kembali_ditolak')

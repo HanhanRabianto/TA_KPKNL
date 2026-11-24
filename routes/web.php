@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\BbmController;
+use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\PajakController;
 use App\Http\Controllers\Admin\ServisController;
 use App\Http\Controllers\Admin\VerifikasiPeminjamanController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\KendaraanController;
 use App\Http\Controllers\Pegawai\PeminjamanController;
 use App\Http\Controllers\Pegawai\PengembalianController;
 use App\Http\Controllers\PengemudiController;
+use App\Http\Controllers\SuratTugasController;
 use App\Http\Controllers\PenggunaController;
 use App\Models\Kendaraan;
 use App\Models\Peminjaman;
@@ -25,6 +28,9 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+
+Route::get('/surat-tugas/{peminjaman}', [SuratTugasController::class, 'show'])->middleware('auth')->whereNumber('peminjaman')->name('surat-tugas.show');
 
 // ---------------- Admin ----------------
 Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -51,7 +57,7 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
         ]);
     })->name('dashboard');
 
-    
+   
     Route::get('/peminjaman', [VerifikasiPeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('/peminjaman/{peminjaman}', [VerifikasiPeminjamanController::class, 'show'])->whereNumber('peminjaman')->name('peminjaman.show');
     Route::post('/peminjaman/{peminjaman}/setujui', [VerifikasiPeminjamanController::class, 'setujui'])->name('peminjaman.setujui');
@@ -75,6 +81,16 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     Route::get('/pajak/{jenis}', [PajakController::class, 'index'])->whereIn('jenis', ['stnk', 'bpkb'])->name('pajak.index');
     Route::get('/pajak/{jenis}/{kendaraan}/bayar', [PajakController::class, 'formBayar'])->whereIn('jenis', ['stnk', 'bpkb'])->name('pajak.bayar');
     Route::post('/pajak/{jenis}/{kendaraan}/bayar', [PajakController::class, 'bayar'])->whereIn('jenis', ['stnk', 'bpkb'])->name('pajak.simpan');
+
+   
+    Route::get('/bbm', [BbmController::class, 'index'])->name('bbm.index');
+    Route::get('/bbm/catat', [BbmController::class, 'create'])->name('bbm.create');
+    Route::post('/bbm', [BbmController::class, 'store'])->name('bbm.store');
+    Route::get('/bbm/{bbm}/struk', [BbmController::class, 'struk'])->name('bbm.struk');
+    Route::delete('/bbm/{bbm}', [BbmController::class, 'destroy'])->name('bbm.destroy');
+
+    Route::get('/laporan/{jenis}', [LaporanController::class, 'tampil'])
+        ->whereIn('jenis', LaporanController::JENIS)->name('laporan.tampil');
 
     
     Route::resource('kendaraan', KendaraanController::class)->except('show');

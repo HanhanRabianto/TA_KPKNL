@@ -37,7 +37,7 @@ class VerifikasiPeminjamanController extends Controller
         return view('admin.peminjaman.index', compact('daftar', 'tab', 'jumlah'));
     }
 
-    // Detail pengajuan: admin hanya memeriksa lalu menyetujui atau menolak
+    
     public function show(Peminjaman $peminjaman): View
     {
         return view('admin.peminjaman.show', ['p' => $peminjaman->load(['pengguna', 'kendaraan', 'pengemudi'])]);
@@ -51,7 +51,7 @@ class VerifikasiPeminjamanController extends Controller
                 return 'Pengajuan ini sudah diproses.';
             }
 
-            // kendaraan dan pengemudi adalah pilihan seksi, bukan pilihan admin
+            
             $k = Kendaraan::whereKey($p->kendaraan_id)->lockForUpdate()->first();
             if (! $k || $k->status !== 'Tersedia') {
                 return 'Kendaraan pilihan seksi sudah tidak tersedia. Tolak pengajuan ini dengan alasan, lalu seksi dapat mengajukan ulang.';
@@ -65,14 +65,14 @@ class VerifikasiPeminjamanController extends Controller
                 }
             }
 
-            // nomor surat tugas dibuat otomatis
+            
             $p->update([
                 'status'          => 'disetujui',
                 'nomor_surat'     => sprintf('ST-%03d/KPKNL-BDG/%s', $p->id, now()->format('Y')),
                 'diputuskan_pada' => now(),
             ]);
 
-            // status kendaraan dan pengemudi berubah otomatis
+            
             $k->update(['status' => 'Sedang dipakai']);
             $sopir?->update(['status' => 'Bertugas']);
 

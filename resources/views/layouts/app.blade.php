@@ -37,6 +37,14 @@
         .flash.ok { background:var(--okb); color:var(--ok); } .flash.err { background:var(--erb); color:var(--er); }
         label { display:block; font-size:12px; color:var(--mu); margin:12px 0 4px; }
         textarea { width:100%; padding:9px; border:1px solid var(--bd); border-radius:8px; font:inherit; background:#fff; }
+        .print-only { display:none; }
+        @media print {
+            header, aside, .no-print, .flash { display:none !important; }
+            .print-only { display:block !important; }
+            td.print-only, span.print-only { display:inline !important; }
+            .wrap { display:block; } main { padding:0; max-width:none; }
+            body { background:#fff; } .card { border:0; padding:0; }
+        }
         aside summary { padding:8px 12px; border-radius:8px; color:var(--mu); cursor:pointer; margin-bottom:2px; }
         aside details[open] > summary { color:var(--pr); font-weight:600; }
         aside a.sub { padding-left:26px; }
@@ -82,6 +90,15 @@
                     <summary>Pajak Kendaraan @if ($nStnk + $nBpkb) <span class="b er" style="float:right">{{ $nStnk + $nBpkb }}</span> @endif</summary>
                     <a class="sub {{ request()->is('admin/pajak/stnk*') ? 'on' : '' }}" href="{{ route('admin.pajak.index', 'stnk') }}">STNK @if ($nStnk) <span class="b er" style="float:right">{{ $nStnk }}</span> @endif</a>
                     <a class="sub {{ request()->is('admin/pajak/bpkb*') ? 'on' : '' }}" href="{{ route('admin.pajak.index', 'bpkb') }}">BPKB @if ($nBpkb) <span class="b er" style="float:right">{{ $nBpkb }}</span> @endif</a>
+                </details>
+                <a href="{{ route('admin.bbm.index') }}" class="{{ request()->routeIs('admin.bbm.*') ? 'on' : '' }}">BBM</a>
+                <details {{ request()->routeIs('admin.laporan.*') ? 'open' : '' }}>
+                    <summary>Laporan</summary>
+                    <a class="sub {{ request()->is('admin/laporan/servis') ? 'on' : '' }}" href="{{ route('admin.laporan.tampil', 'servis') }}">Laporan Servis</a>
+                    <a class="sub {{ request()->is('admin/laporan/stnk') ? 'on' : '' }}" href="{{ route('admin.laporan.tampil', 'stnk') }}">Laporan Pembayaran STNK</a>
+                    <a class="sub {{ request()->is('admin/laporan/bpkb') ? 'on' : '' }}" href="{{ route('admin.laporan.tampil', 'bpkb') }}">Laporan Pembayaran BPKB</a>
+                    <a class="sub {{ request()->is('admin/laporan/pemakaian-kendaraan') ? 'on' : '' }}" href="{{ route('admin.laporan.tampil', 'pemakaian-kendaraan') }}">Laporan Pemakaian Kendaraan</a>
+                    <a class="sub {{ request()->is('admin/laporan/pemakaian-seksi') ? 'on' : '' }}" href="{{ route('admin.laporan.tampil', 'pemakaian-seksi') }}">Laporan Pemakaian Seksi</a>
                 </details>
                 <div class="grp">Data</div>
                 <a href="{{ route('admin.kendaraan.index') }}" class="{{ request()->routeIs('admin.kendaraan.*') ? 'on' : '' }}">Kendaraan</a>

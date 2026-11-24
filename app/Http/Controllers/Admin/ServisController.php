@@ -56,7 +56,7 @@ class ServisController extends Controller
             }
 
             Servis::create($data + ['status' => 'Berjalan']);
-            // status kendaraan berubah otomatis: tidak bisa dipinjam selama diservis
+            
             $k->update(['status' => 'Sedang diservis']);
 
             return null;
@@ -102,7 +102,7 @@ class ServisController extends Controller
 
             $k = $s->kendaraan;
             $ubah = ['status' => 'Tersedia'];
-            // odometer hanya boleh naik
+            
             if (isset($data['odometer_keluar']) && $data['odometer_keluar'] > $k->odometer) {
                 $ubah['odometer'] = $data['odometer_keluar'];
             }

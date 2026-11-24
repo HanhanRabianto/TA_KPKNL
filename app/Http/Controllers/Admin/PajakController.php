@@ -12,7 +12,7 @@ use Illuminate\View\View;
 
 class PajakController extends Controller
 {
-    // slug => [nama dokumen, kolom pada tabel kendaraan, masa berlaku default (tahun)]
+    
     private const JENIS = [
         'stnk' => ['STNK', 'stnk_berlaku', 1],
         'bpkb' => ['BPKB', 'bpkb_berlaku', 5],
@@ -31,7 +31,7 @@ class PajakController extends Controller
 
         $semua = Kendaraan::orderBy('plat')->get();
 
-        // hanya kendaraan yang perlu ditindaklanjuti: jatuh tempo <= 30 hari, sudah lewat, atau belum ada tanggal
+        
         $perlu = $semua
             ->filter(fn ($k) => $k->{$kolom} === null || $k->sisaHari($kolom) <= 30)
             ->sortBy(fn ($k) => $k->sisaHari($kolom) ?? PHP_INT_MAX)
@@ -90,7 +90,7 @@ class PajakController extends Controller
 
         DB::transaction(function () use ($kendaraan, $nama, $kolom, $data) {
             PembayaranPajak::create($data + ['kendaraan_id' => $kendaraan->id, 'jenis' => $nama]);
-            // tanggal berlaku pada kendaraan maju otomatis
+            
             $kendaraan->update([$kolom => $data['berlaku_sampai']]);
         });
 
