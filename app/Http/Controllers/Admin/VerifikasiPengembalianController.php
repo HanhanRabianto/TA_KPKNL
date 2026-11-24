@@ -11,20 +11,21 @@ use Illuminate\View\View;
 
 class VerifikasiPengembalianController extends Controller
 {
-    private const TABS = ['menunggu', 'diterima', 'ditolak'];
-
-    public function index(Request $request): View
+    public function index(): View
     {
-        $tab = in_array($request->query('tab'), self::TABS, true) ? $request->query('tab') : 'menunggu';
+        $dengan = ['peminjaman.pengguna', 'peminjaman.kendaraan'];
 
-        $daftar = Pengembalian::with(['peminjaman.pengguna', 'peminjaman.kendaraan', 'peminjaman.pengemudi'])
-            ->where('status', $tab)
-            ->orderByDesc('id')
-            ->get();
+        return view('admin.pengembalian.index', [
+            'menunggu'  => Pengembalian::with($dengan)->where('status', 'menunggu')->orderBy('id')->get(),
+            'diterima'  => Pengembalian::with($dengan)->where('status', 'diterima')->orderByDesc('id')->get(),
+            'ditolak'   => Pengembalian::with($dengan)->where('status', 'ditolak')->orderByDesc('id')->get(),
+        ]);
+    }
 
-        $jumlah = Pengembalian::selectRaw('status, count(*) as n')->groupBy('status')->pluck('n', 'status');
-
-        return view('admin.pengembalian.index', compact('daftar', 'tab', 'jumlah'));
+    
+    public function show(Pengembalian $pengembalian): View
+    {
+        return view('admin.pengembalian.show', ['r' => $pengembalian->load('peminjaman.pengguna', 'peminjaman.kendaraan')]);
     }
 
     public function terima(Pengembalian $pengembalian): RedirectResponse
@@ -49,16 +50,7 @@ class VerifikasiPengembalianController extends Controller
 
         return $pesan
             ? back()->with('err', $pesan)
-            : redirect()->route('admin.pengembalian.index')->with('ok', 'Pengembalian diterima. Kendaraan kembali berstatus Tersedia dan odometer diperbarui.');
-    }
-
-    public function formTolak(Pengembalian $pengembalian): View|RedirectResponse
-    {
-        if ($pengembalian->status !== 'menunggu') {
-            return redirect()->route('admin.pengembalian.index')->with('err', 'Laporan ini sudah diproses.');
-        }
-
-        return view('admin.pengembalian.tolak', ['r' => $pengembalian->load('peminjaman.pengguna', 'peminjaman.kendaraan')]);
+            : redirect()->route('admin.pengembalian.index')->with('ok', 'Pengembalian disetujui. Data masuk ke Laporan Pemakaian.');
     }
 
     public function tolak(Request $request, Pengembalian $pengembalian): RedirectResponse
@@ -66,7 +58,7 @@ class VerifikasiPengembalianController extends Controller
         $data = $request->validate([
             'alasan_tolak' => ['required', 'string', 'min:5', 'max:1000'],
         ], [
-            'alasan_tolak.required' => 'Alasan penolakan wajib diisi.',
+            'alasan_tolak.required' => 'Isi alasan penolakan.',
             'alasan_tolak.min'      => 'Alasan penolakan terlalu singkat (minimal 5 karakter).',
         ]);
 
@@ -84,6 +76,6 @@ class VerifikasiPengembalianController extends Controller
         });
 
         return redirect()->route('admin.pengembalian.index')
-            ->with($ok ? 'ok' : 'err', $ok ? 'Laporan pengembalian ditolak.' : 'Laporan ini sudah diproses.');
+            ->with($ok ? 'ok' : 'err', $ok ? 'Pengembalian ditolak.' : 'Laporan ini sudah diproses.');
     }
 }

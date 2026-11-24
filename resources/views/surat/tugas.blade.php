@@ -59,7 +59,7 @@
 
         <div class="ttd">
             Bandung, {{ ($p->diputuskan_pada ?? now())->locale('id')->translatedFormat('d F Y') }}<br>
-            Kepala Subbagian Umum,
+            Kepala Bagian Umum,
             <br><br><br><br>
             (........................................)
         </div>

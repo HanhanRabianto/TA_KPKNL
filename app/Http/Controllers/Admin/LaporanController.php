@@ -66,11 +66,11 @@ class LaporanController extends Controller
         return [
             'judul' => 'Laporan Servis',
             'sub'   => 'Rekap servis kendaraan dinas',
-            'kartu' => ['Jumlah servis' => $data->count(), 'Total biaya' => $this->rp($data->sum($biaya))],
-            'kolom' => ['Tanggal masuk', 'Kendaraan', 'Jenis servis', 'Bengkel', 'Biaya', 'Status'],
+            'kartu' => ['Jumlah servis' => $data->count(), 'Total biaya servis' => $this->rp($data->sum($biaya))],
+            'kolom' => ['Tanggal servis', 'Kendaraan', 'Jenis servis', 'Bengkel', 'Biaya'],
             'baris' => $data->map(fn ($s) => [
-                $s->tgl_masuk->format('d/m/Y'), $s->kendaraan->plat.' - '.$s->kendaraan->jenis, $s->jenis,
-                $s->bengkel ?: '-', $this->rp($biaya($s)), $s->status,
+                $s->tgl_masuk->format('d/m/Y'), $s->kendaraan->nama, $s->jenis,
+                $s->bengkel ?: '-', $this->rp($biaya($s)),
             ])->all(),
         ];
     }
@@ -88,7 +88,7 @@ class LaporanController extends Controller
             'kartu' => ['Jumlah pembayaran' => $data->count(), 'Total nominal' => $this->rp($data->sum('nominal'))],
             'kolom' => ['Tanggal bayar', 'Kendaraan', 'Nominal', 'Berlaku sampai', 'Keterangan'],
             'baris' => $data->map(fn ($p) => [
-                $p->tgl_bayar->format('d/m/Y'), $p->kendaraan->plat.' - '.$p->kendaraan->jenis,
+                $p->tgl_bayar->format('d/m/Y'), $p->kendaraan->nama,
                 $this->rp($p->nominal), $p->berlaku_sampai->format('d/m/Y'), $p->keterangan ?: '-',
             ])->all(),
         ];
@@ -110,11 +110,11 @@ class LaporanController extends Controller
 
         return [
             'judul' => 'Laporan Pemakaian Kendaraan',
-            'sub'   => 'Rekap pemakaian kendaraan dinas',
+            'sub'   => 'Rekap pemakaian dan siapa yang memakai kendaraan, dari pengembalian yang disetujui',
             'kartu' => ['Jumlah pemakaian' => $data->count(), 'Total jarak' => number_format($data->sum(fn ($p) => $p->pengembalian->jarak), 0, ',', '.').' km'],
             'kolom' => ['Kendaraan', 'Tanggal mulai', 'Tanggal selesai', 'Seksi', 'Petugas', 'Tujuan', 'Jarak'],
             'baris' => $data->map(fn ($p) => [
-                $p->kendaraan->plat.' - '.$p->kendaraan->jenis, $p->mulai->format('d/m/Y H:i'), $p->selesai?->format('d/m/Y H:i') ?? '-',
+                $p->kendaraan->nama, $p->mulai->format('d/m/Y H:i'), $p->selesai?->format('d/m/Y H:i') ?? '-',
                 $p->pengguna->nama_seksi, $p->petugas, $p->tujuan, number_format($p->pengembalian->jarak, 0, ',', '.').' km',
             ])->all(),
         ];
@@ -131,7 +131,7 @@ class LaporanController extends Controller
             'kolom' => ['Tanggal mulai', 'Tanggal selesai', 'Seksi', 'Petugas', 'Tujuan', 'Kendaraan', 'Odometer awal', 'Odometer akhir'],
             'baris' => $data->map(fn ($p) => [
                 $p->mulai->format('d/m/Y H:i'), $p->selesai?->format('d/m/Y H:i') ?? '-', $p->pengguna->nama_seksi,
-                $p->petugas, $p->tujuan, $p->kendaraan->plat.' - '.$p->kendaraan->jenis,
+                $p->petugas, $p->tujuan, $p->kendaraan->nama,
                 number_format($p->pengembalian->odometer_awal, 0, ',', '.'), number_format($p->pengembalian->odometer_akhir, 0, ',', '.'),
             ])->all(),
         ];

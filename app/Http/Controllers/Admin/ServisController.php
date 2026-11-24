@@ -15,10 +15,9 @@ class ServisController extends Controller
     public function index(): View
     {
         return view('admin.servis.index', [
-            'daftar'   => Servis::with('kendaraan')->orderByRaw("status = 'Berjalan' desc")->orderByDesc('tgl_masuk')->orderByDesc('id')->get(),
+            'berjalan'        => Servis::with('kendaraan')->where('status', 'Berjalan')->orderBy('tgl_masuk')->get(),
+            'riwayat'         => Servis::with('kendaraan')->where('status', 'Selesai')->orderByDesc('tgl_masuk')->orderByDesc('id')->get(),
             'jumlahKendaraan' => Kendaraan::count(),
-            'berjalan' => Servis::where('status', 'Berjalan')->count(),
-            'selesai'  => Servis::where('status', 'Selesai')->count(),
         ]);
     }
 

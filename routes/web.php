@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BbmController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\PajakController;
 use App\Http\Controllers\Admin\ServisController;
@@ -12,13 +13,9 @@ use App\Http\Controllers\Pegawai\BerandaController;
 use App\Http\Controllers\Pegawai\PeminjamanController;
 use App\Http\Controllers\Pegawai\PengembalianController;
 use App\Http\Controllers\PengemudiController;
-use App\Http\Controllers\SuratTugasController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\ProfilController;
-use App\Models\Kendaraan;
-use App\Models\Peminjaman;
-use App\Models\Pengembalian;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\SuratTugasController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -33,37 +30,18 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 
 
 Route::middleware('auth')->group(function () {
+   
     Route::get('/profil', [ProfilController::class, 'show'])->name('profil.show');
     Route::post('/profil', [ProfilController::class, 'simpan'])->name('profil.simpan');
     Route::post('/profil/sandi', [ProfilController::class, 'sandi'])->name('profil.sandi');
+
+    
+    Route::get('/surat-tugas/{peminjaman}', [SuratTugasController::class, 'show'])->whereNumber('peminjaman')->name('surat-tugas.show');
 });
-
-
-Route::get('/surat-tugas/{peminjaman}', [SuratTugasController::class, 'show'])->middleware('auth')->whereNumber('peminjaman')->name('surat-tugas.show');
 
 // ---------------- Admin ----------------
 Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard', [
-            'totalKendaraan'   => DB::table('kendaraan')->count(),
-            'tersedia'         => DB::table('kendaraan')->where('status', 'Tersedia')->count(),
-            'dipakai'          => DB::table('kendaraan')->where('status', 'Sedang dipakai')->count(),
-            'diservis'         => DB::table('kendaraan')->where('status', 'Sedang diservis')->count(),
-            'totalPengemudi'   => DB::table('pengemudi')->count(),
-            'pengemudiSedia'   => DB::table('pengemudi')->where('status', 'Tersedia')->count(),
-            'totalSeksi'       => DB::table('pengguna')->where('peran', 'pegawai')->count(),
-            'pengajuanMenunggu' => Peminjaman::where('status', 'menunggu')->count(),
-            'pengembalianMenunggu' => Pengembalian::where('status', 'menunggu')->count(),
-            'stnkTempo' => Kendaraan::jumlahJatuhTempo('stnk_berlaku'),
-            'bpkbTempo' => Kendaraan::jumlahJatuhTempo('bpkb_berlaku'),
-            'pajakTempo' => Kendaraan::orderBy('plat')->get()
-                ->flatMap(fn ($k) => collect([['STNK', 'stnk_berlaku', 'stnk'], ['BPKB', 'bpkb_berlaku', 'bpkb']])
-                    ->map(fn ($j) => ['k' => $k, 'jenis' => $j[0], 'tgl' => $k->{$j[1]}, 'sisa' => $k->sisaHari($j[1]), 'slug' => $j[2]]))
-                ->filter(fn ($r) => $r['sisa'] !== null && $r['sisa'] <= 30)
-                ->sortBy('sisa')
-                ->values(),
-        ]);
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     
     Route::get('/peminjaman', [VerifikasiPeminjamanController::class, 'index'])->name('peminjaman.index');
@@ -74,9 +52,9 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
 
     
     Route::get('/pengembalian', [VerifikasiPengembalianController::class, 'index'])->name('pengembalian.index');
+    Route::get('/pengembalian/{pengembalian}', [VerifikasiPengembalianController::class, 'show'])->whereNumber('pengembalian')->name('pengembalian.show');
     Route::post('/pengembalian/{pengembalian}/terima', [VerifikasiPengembalianController::class, 'terima'])->name('pengembalian.terima');
-    Route::get('/pengembalian/{pengembalian}/tolak', [VerifikasiPengembalianController::class, 'formTolak'])->name('pengembalian.tolak');
-    Route::post('/pengembalian/{pengembalian}/tolak', [VerifikasiPengembalianController::class, 'tolak']);
+    Route::post('/pengembalian/{pengembalian}/tolak', [VerifikasiPengembalianController::class, 'tolak'])->name('pengembalian.tolak');
 
     
     Route::get('/servis', [ServisController::class, 'index'])->name('servis.index');
@@ -111,7 +89,7 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
 Route::middleware(['auth', 'peran:pegawai'])->prefix('pegawai')->name('pegawai.')->group(function () {
     Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
 
-    
+   
     Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('/peminjaman/buat', [PeminjamanController::class, 'create'])->name('peminjaman.create');
     Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');

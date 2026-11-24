@@ -13,28 +13,15 @@ use Illuminate\View\View;
 
 class VerifikasiPeminjamanController extends Controller
 {
-    private const TAB = [
-        'menunggu' => ['menunggu'],
-        'diterima' => ['disetujui', 'verifikasi', 'kembali_ditolak', 'selesai'],
-        'ditolak'  => ['ditolak'],
-    ];
-
-    public function index(Request $request): View
+    public function index(): View
     {
-        $tab = array_key_exists($request->query('tab'), self::TAB) ? $request->query('tab') : 'menunggu';
+        $dengan = ['pengguna', 'kendaraan', 'pengemudi'];
 
-        $daftar = Peminjaman::with(['pengguna', 'kendaraan', 'pengemudi'])
-            ->whereIn('status', self::TAB[$tab])
-            ->orderByDesc('id')
-            ->get();
-
-        $per = Peminjaman::selectRaw('status, count(*) as n')->groupBy('status')->pluck('n', 'status');
-        $jumlah = [];
-        foreach (self::TAB as $nama => $statuses) {
-            $jumlah[$nama] = collect($statuses)->sum(fn ($s) => (int) ($per[$s] ?? 0));
-        }
-
-        return view('admin.peminjaman.index', compact('daftar', 'tab', 'jumlah'));
+        return view('admin.peminjaman.index', [
+            'menunggu'  => Peminjaman::with($dengan)->where('status', 'menunggu')->orderBy('id')->get(),
+            'disetujui' => Peminjaman::with($dengan)->whereIn('status', ['disetujui', 'verifikasi', 'kembali_ditolak', 'selesai'])->orderByDesc('id')->get(),
+            'ditolak'   => Peminjaman::with($dengan)->where('status', 'ditolak')->orderByDesc('id')->get(),
+        ]);
     }
 
     
@@ -68,7 +55,7 @@ class VerifikasiPeminjamanController extends Controller
             
             $p->update([
                 'status'          => 'disetujui',
-                'nomor_surat'     => sprintf('ST-%03d/KPKNL-BDG/%s', $p->id, now()->format('Y')),
+                'nomor_surat'     => sprintf('ST-%03d/KPKNL-Bandung/%s', $p->id, $p->mulai->format('Y')),
                 'diputuskan_pada' => now(),
             ]);
 
