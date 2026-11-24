@@ -20,6 +20,15 @@ class Kendaraan extends Model
         ];
     }
 
+    
+    public static function jumlahJatuhTempo(string $kolom, int $hari = 30): int
+    {
+        return static::whereNotNull($kolom)
+            ->where($kolom, '<=', now()->addDays($hari)->toDateString())
+            ->count();
+    }
+
+    
     public function sisaHari(string $kolom): ?int
     {
         $tgl = $this->{$kolom};

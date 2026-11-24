@@ -37,55 +37,38 @@ class VerifikasiPeminjamanController extends Controller
         return view('admin.peminjaman.index', compact('daftar', 'tab', 'jumlah'));
     }
 
-    public function formSetujui(Peminjaman $peminjaman): View|RedirectResponse
+    // Detail pengajuan: admin hanya memeriksa lalu menyetujui atau menolak
+    public function show(Peminjaman $peminjaman): View
     {
-        if ($peminjaman->status !== 'menunggu') {
-            return redirect()->route('admin.peminjaman.index')->with('err', 'Pengajuan ini sudah diproses.');
-        }
-
-        return view('admin.peminjaman.setujui', [
-            'p'          => $peminjaman->load('pengguna'),
-            'kendaraan'  => Kendaraan::where('status', 'Tersedia')->orderBy('plat')->get(),
-            'pengemudi'  => Pengemudi::where('status', 'Tersedia')->orderBy('nama')->get(),
-            'nomorSaran' => sprintf('ST-%03d/KPKNL-BDG/%s', $peminjaman->id, now()->format('Y')),
-        ]);
+        return view('admin.peminjaman.show', ['p' => $peminjaman->load(['pengguna', 'kendaraan', 'pengemudi'])]);
     }
 
-    public function setujui(Request $request, Peminjaman $peminjaman): RedirectResponse
+    public function setujui(Peminjaman $peminjaman): RedirectResponse
     {
-        $data = $request->validate([
-            'kendaraan_id' => ['required', 'exists:kendaraan,id'],
-            'pengemudi_id' => ['nullable', 'exists:pengemudi,id'],
-            'nomor_surat'  => ['required', 'string', 'max:60'],
-        ], [
-            'kendaraan_id.required' => 'Pilih kendaraan yang akan ditugaskan.',
-            'nomor_surat.required'  => 'Nomor surat tugas wajib diisi.',
-        ]);
-
-        $pesan = DB::transaction(function () use ($peminjaman, $data) {
+        $pesan = DB::transaction(function () use ($peminjaman) {
             $p = Peminjaman::whereKey($peminjaman->id)->lockForUpdate()->first();
             if ($p->status !== 'menunggu') {
                 return 'Pengajuan ini sudah diproses.';
             }
 
-            $k = Kendaraan::whereKey($data['kendaraan_id'])->lockForUpdate()->first();
-            if ($k->status !== 'Tersedia') {
-                return 'Kendaraan yang dipilih sudah tidak tersedia. Pilih kendaraan lain.';
+            // kendaraan dan pengemudi adalah pilihan seksi, bukan pilihan admin
+            $k = Kendaraan::whereKey($p->kendaraan_id)->lockForUpdate()->first();
+            if (! $k || $k->status !== 'Tersedia') {
+                return 'Kendaraan pilihan seksi sudah tidak tersedia. Tolak pengajuan ini dengan alasan, lalu seksi dapat mengajukan ulang.';
             }
 
             $sopir = null;
-            if (! empty($data['pengemudi_id'])) {
-                $sopir = Pengemudi::whereKey($data['pengemudi_id'])->lockForUpdate()->first();
-                if ($sopir->status !== 'Tersedia') {
-                    return 'Pengemudi yang dipilih sudah bertugas. Pilih pengemudi lain.';
+            if ($p->pengemudi_id) {
+                $sopir = Pengemudi::whereKey($p->pengemudi_id)->lockForUpdate()->first();
+                if (! $sopir || $sopir->status !== 'Tersedia') {
+                    return 'Pengemudi pilihan seksi sedang bertugas. Tolak pengajuan ini dengan alasan, lalu seksi dapat mengajukan ulang.';
                 }
             }
 
+            // nomor surat tugas dibuat otomatis
             $p->update([
                 'status'          => 'disetujui',
-                'kendaraan_id'    => $k->id,
-                'pengemudi_id'    => $sopir?->id,
-                'nomor_surat'     => $data['nomor_surat'],
+                'nomor_surat'     => sprintf('ST-%03d/KPKNL-BDG/%s', $p->id, now()->format('Y')),
                 'diputuskan_pada' => now(),
             ]);
 
@@ -97,10 +80,10 @@ class VerifikasiPeminjamanController extends Controller
         });
 
         if ($pesan) {
-            return back()->withInput()->with('err', $pesan);
+            return back()->with('err', $pesan);
         }
 
-        return redirect()->route('admin.peminjaman.index')->with('ok', 'Pengajuan disetujui. Kendaraan berstatus Sedang dipakai.');
+        return redirect()->route('admin.peminjaman.index')->with('ok', 'Pengajuan disetujui. Surat tugas terbit dan kendaraan berstatus Sedang dipakai.');
     }
 
     public function formTolak(Peminjaman $peminjaman): View|RedirectResponse

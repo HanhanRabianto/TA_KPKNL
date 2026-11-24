@@ -24,6 +24,31 @@
         <div class="card"><div class="num">{{ $tersedia }}</div><div class="lbl">Kendaraan tersedia</div></div>
         <div class="card"><div class="num">{{ $dipakai }}</div><div class="lbl">Sedang dipakai</div></div>
         <div class="card"><div class="num">{{ $diservis }}</div><div class="lbl">Sedang perbaikan</div></div>
+        <div class="card"><div class="num">{{ $stnkTempo }}</div><div class="lbl">STNK jatuh tempo 30 hari</div></div>
+        <div class="card"><div class="num">{{ $bpkbTempo }}</div><div class="lbl">BPKB jatuh tempo 30 hari</div></div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0">Pajak Jatuh Tempo ({{ $pajakTempo->count() }})</h3>
+        <div class="tw">
+            <table>
+                <tr><th>Kendaraan</th><th>Jenis</th><th>Berlaku sampai</th><th>Sisa waktu</th><th>Aksi</th></tr>
+                @forelse ($pajakTempo as $r)
+                    <tr>
+                        <td>{{ $r['k']->plat }}<br><span class="note">{{ $r['k']->jenis }}</span></td>
+                        <td>{{ $r['jenis'] }}</td>
+                        <td>{{ $r['tgl']->format('d/m/Y') }}</td>
+                        <td>
+                            @if ($r['sisa'] < 0) <span class="b er">Lewat {{ abs($r['sisa']) }} hari</span>
+                            @else <span class="b wr">{{ $r['sisa'] }} hari lagi</span> @endif
+                        </td>
+                        <td><a class="btn s" href="{{ route('admin.pajak.index', $r['slug']) }}">Buka {{ $r['jenis'] }}</a></td>
+                    </tr>
+                @empty
+                    <tr><td colspan="5" class="note" style="text-align:center; padding:20px">Tidak ada pajak yang jatuh tempo dalam 30 hari.</td></tr>
+                @endforelse
+            </table>
+        </div>
     </div>
 
     <h3>Pengemudi dan seksi</h3>

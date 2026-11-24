@@ -30,8 +30,7 @@
                         <td>@include('partials.status', ['p' => $p])</td>
                         <td style="white-space:nowrap">
                             @if ($p->status === 'menunggu')
-                                <a class="btn" href="{{ route('admin.peminjaman.setujui', $p) }}">Setujui</a>
-                                <a class="btn d" href="{{ route('admin.peminjaman.tolak', $p) }}">Tolak</a>
+                                <a class="btn" href="{{ route('admin.peminjaman.show', $p) }}">Verifikasi</a>
                             @elseif ($p->status === 'ditolak')
                                 <span class="note">Alasan: {{ $p->alasan_tolak }}</span>
                             @else

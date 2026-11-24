@@ -73,17 +73,24 @@ class PeminjamanController extends Controller
             'petugas'       => ['required', 'string', 'max:100'],
             'penumpang'     => ['required', 'integer', 'min:1', 'max:20'],
             'catatan'       => ['nullable', 'string', 'max:1000'],
-            'mulai'         => ['required', 'date', 'after_or_equal:today'],
+            'tanggal_mulai' => ['required', 'date', 'after_or_equal:today'],
+            'jam_mulai'     => ['required', 'date_format:H:i'],
         ], [
             'kendaraan_id.required' => 'Pilih kendaraan yang akan dipinjam.',
             'tujuan.required'       => 'Tujuan perjalanan wajib diisi.',
-            'petugas.required'      => 'Nama petugas wajib diisi.',
             'penumpang.required'    => 'Jumlah penumpang wajib diisi.',
             'penumpang.min'         => 'Jumlah penumpang minimal 1.',
             'penumpang.max'         => 'Jumlah penumpang maksimal 20.',
-            'mulai.required'        => 'Tanggal dan jam mulai wajib diisi.',
-            'mulai.after_or_equal'  => 'Waktu mulai tidak boleh sebelum hari ini.',
+            'petugas.required'      => 'Nama pegawai yang bertugas wajib diisi.',
+            'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
+            'tanggal_mulai.after_or_equal' => 'Tanggal mulai tidak boleh sebelum hari ini.',
+            'jam_mulai.required'    => 'Jam mulai wajib diisi.',
+            'jam_mulai.date_format' => 'Format jam mulai tidak valid.',
         ]);
+
+        // tanggal dan jam digabung menjadi satu kolom waktu mulai
+        $data['mulai'] = \Illuminate\Support\Carbon::parse($data['tanggal_mulai'].' '.$data['jam_mulai']);
+        unset($data['tanggal_mulai'], $data['jam_mulai']);
 
         $uid = $request->user()->id;
 

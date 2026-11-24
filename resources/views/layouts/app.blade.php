@@ -37,6 +37,9 @@
         .flash.ok { background:var(--okb); color:var(--ok); } .flash.err { background:var(--erb); color:var(--er); }
         label { display:block; font-size:12px; color:var(--mu); margin:12px 0 4px; }
         textarea { width:100%; padding:9px; border:1px solid var(--bd); border-radius:8px; font:inherit; background:#fff; }
+        aside summary { padding:8px 12px; border-radius:8px; color:var(--mu); cursor:pointer; margin-bottom:2px; }
+        aside details[open] > summary { color:var(--pr); font-weight:600; }
+        aside a.sub { padding-left:26px; }
         .tabs { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
         input, select { width:100%; padding:9px; border:1px solid var(--bd); border-radius:8px; font:inherit; background:#fff; }
         input[readonly] { background:#eef1f6; color:var(--mu); }
@@ -59,6 +62,8 @@
             $adalahAdmin = auth()->user()->peran === 'admin';
             $nMenunggu = $adalahAdmin ? \App\Models\Peminjaman::where('status', 'menunggu')->count() : 0;
             $nKembali = $adalahAdmin ? \App\Models\Pengembalian::where('status', 'menunggu')->count() : 0;
+            $nStnk = $adalahAdmin ? \App\Models\Kendaraan::jumlahJatuhTempo('stnk_berlaku') : 0;
+            $nBpkb = $adalahAdmin ? \App\Models\Kendaraan::jumlahJatuhTempo('bpkb_berlaku') : 0;
         @endphp
         <aside>
             @if ($adalahAdmin)
@@ -71,6 +76,13 @@
                     Verifikasi Pengembalian
                     @if ($nKembali) <span class="b er" style="float:right">{{ $nKembali }}</span> @endif
                 </a>
+                <div class="grp">Operasional</div>
+                <a href="{{ route('admin.servis.index') }}" class="{{ request()->routeIs('admin.servis.*') ? 'on' : '' }}">Servis</a>
+                <details {{ request()->routeIs('admin.pajak.*') ? 'open' : '' }}>
+                    <summary>Pajak Kendaraan @if ($nStnk + $nBpkb) <span class="b er" style="float:right">{{ $nStnk + $nBpkb }}</span> @endif</summary>
+                    <a class="sub {{ request()->is('admin/pajak/stnk*') ? 'on' : '' }}" href="{{ route('admin.pajak.index', 'stnk') }}">STNK @if ($nStnk) <span class="b er" style="float:right">{{ $nStnk }}</span> @endif</a>
+                    <a class="sub {{ request()->is('admin/pajak/bpkb*') ? 'on' : '' }}" href="{{ route('admin.pajak.index', 'bpkb') }}">BPKB @if ($nBpkb) <span class="b er" style="float:right">{{ $nBpkb }}</span> @endif</a>
+                </details>
                 <div class="grp">Data</div>
                 <a href="{{ route('admin.kendaraan.index') }}" class="{{ request()->routeIs('admin.kendaraan.*') ? 'on' : '' }}">Kendaraan</a>
                 <a href="{{ route('admin.pengemudi.index') }}" class="{{ request()->routeIs('admin.pengemudi.*') ? 'on' : '' }}">Pengemudi</a>
