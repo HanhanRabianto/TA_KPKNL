@@ -11,28 +11,38 @@
         body { margin:0; font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--tx); }
         a { color:var(--pr); }
 
-       
         .app { display:flex; min-height:100vh; }
-        nav.side { width:262px; flex-shrink:0; color:#fff; padding:18px 12px; display:flex; flex-direction:column; gap:2px; position:sticky; top:0; height:100vh; overflow-y:auto; }
-        nav.side .brand { font-size:18px; padding:0 12px; }
-        nav.side .sub { color:#d6e2f2; padding:0 12px 14px; font-size:12px; }
-        nav.side a { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; color:#d6e2f2; text-decoration:none; }
-        nav.side a:hover { background:rgba(255,255,255,.08); }
-        nav.side a.on { background:rgba(255,255,255,.18); color:#fff; font-weight:600; }
-        nav.side summary { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; color:#fff; font-weight:600; cursor:pointer; list-style:none; }
+        nav.side { width:272px; flex-shrink:0; background:var(--side,#0B2F5B); color:#fff; padding:18px 14px; display:flex; flex-direction:column; gap:6px; position:sticky; top:0; height:100vh; overflow-y:auto; align-self:flex-start; }
+        nav.side .brand { display:flex; align-items:center; gap:12px; padding:4px 6px 16px; }
+        nav.side .brand b { display:block; font-size:17px; line-height:1.2; }
+        nav.side .brand small { display:block; color:#d6e2f2; font-size:12px; margin-top:2px; }
+        nav.side .bi { width:42px; height:42px; border-radius:12px; background:rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        nav.side .bi svg { width:22px; height:22px; }
+        nav.side .navs { display:flex; flex-direction:column; gap:4px; }
+        nav.side a, nav.side summary { display:flex; align-items:center; gap:12px; color:#d6e2f2; text-decoration:none; padding:8px 10px; border-radius:12px; cursor:pointer; font-weight:600; list-style:none; }
+        nav.side summary { color:#fff; }
         nav.side summary::-webkit-details-marker { display:none; }
-        nav.side summary::after { content:'\25BE'; opacity:.7; margin-left:6px; }
-        nav.side summary > span.t { flex:1; }
-        nav.side details > a, nav.side details > details { margin-left:10px; }
-        nav.side details details > a { margin-left:10px; }
-        nav.side details details > summary { font-weight:500; color:#d6e2f2; }
-        nav.side .nb { background:#f5b942; color:#3b2a00; border-radius:99px; padding:0 8px; font-size:11px; font-weight:700; }
-        nav.side .bawah { margin-top:auto; border-top:1px solid rgba(255,255,255,.25); padding-top:12px; display:flex; flex-direction:column; gap:8px; }
-        nav.side .av { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.25); display:grid; place-items:center; font-weight:700; flex-shrink:0; }
-        nav.side a.prof { justify-content:flex-start; gap:10px; }
-        nav.side a.prof small { opacity:.8; }
+        nav.side summary::after { content:'\25BE'; margin-left:8px; opacity:.7; font-size:12px; }
+        nav.side a:hover, nav.side summary:hover { background:rgba(255,255,255,.08); }
+        nav.side a.on { background:#fff; color:var(--side,#0B2F5B); }
+        nav.side .lb { flex:1; min-width:0; }
+        nav.side .ic { width:34px; height:34px; border-radius:10px; background:rgba(255,255,255,.12); display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+        nav.side .ic svg { width:18px; height:18px; }
+        nav.side a.on .ic { background:rgba(0,0,0,.08); }
+        nav.side details > a, nav.side details > details > a { font-weight:500; font-size:13px; padding:8px 10px 8px 56px; }
+        nav.side details details > a { padding-left:72px; }
+        nav.side details details > summary { font-weight:500; font-size:13px; color:#d6e2f2; padding:8px 10px 8px 56px; }
+        nav.side .nb { background:#E5484D; color:#fff; border-radius:99px; font-size:11px; font-weight:700; min-width:20px; height:20px; padding:0 6px; display:inline-flex; align-items:center; justify-content:center; margin-left:8px; }
+        nav.side .bawah { margin-top:auto; display:flex; flex-direction:column; gap:10px; padding-top:14px; }
+        nav.side a.prof { border:1px solid rgba(255,255,255,.28); border-radius:14px; padding:10px 12px; gap:10px; font-weight:400; color:#fff; }
+        nav.side a.prof.on { background:#fff; color:var(--side,#0B2F5B); }
+        nav.side a.prof b { display:block; font-size:14px; }
+        nav.side a.prof small { opacity:.8; font-size:12px; }
+        nav.side .av { width:36px; height:36px; border-radius:50%; background:#fff; color:var(--side,#0B2F5B); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0; }
+        nav.side a.prof.on .av { background:var(--side,#0B2F5B); color:#fff; }
         nav.side form { margin:0; }
-        nav.side .keluar { width:100%; background:transparent; color:#fff; border:1px solid rgba(255,255,255,.5); padding:8px; border-radius:8px; cursor:pointer; }
+        nav.side .keluar { width:100%; min-height:44px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); border-radius:10px; font:inherit; font-weight:700; cursor:pointer; }
+        nav.side .keluar:hover { background:rgba(255,255,255,.08); }
         .main { flex:1; min-width:0; padding:24px; max-width:1240px; }
 
         h1 { font-size:22px; margin:0; } h2 { font-size:18px; margin:0 0 12px; } h3 { font-size:15px; margin:18px 0 8px; }
@@ -74,7 +84,9 @@
         }
         @media (max-width:860px) {
             .app { flex-direction:column; }
-            nav.side { width:100%; height:auto; position:static; }
+            nav.side { width:100%; height:auto; position:static; align-self:stretch; overflow:visible; }
+            nav.side .navs { flex-direction:row; flex-wrap:wrap; }
+            nav.side details { width:100%; }
             .dl { grid-template-columns:1fr; }
         }
     </style>
@@ -83,7 +95,23 @@
 @php
     $u = auth()->user();
     $admin = $u->peran === 'admin';
-    $on = fn (string $pola) => request()->routeIs($pola) ? 'on' : '';
+    $on = fn (string ...$pola) => request()->routeIs(...$pola) ? 'on' : '';
+
+    // ikon sidebar (garis, mengikuti warna teks)
+    $ikon = [
+        'grid'   => '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+        'check'  => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+        'layers' => '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+        'db'     => '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
+        'home'   => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+        'plus'   => '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
+        'clock'  => '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+        'truck'  => '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+    ];
+    $svg = fn (string $n) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$ikon[$n].'</svg>';
+    $ic = fn (string $n) => '<span class="ic">'.$svg($n).'</span>';
+    $inisial = mb_strtoupper(collect(preg_split('/\s+/', trim($u->nama_seksi)))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode(''));
+
     if ($admin) {
         $nPinjam = \App\Models\Peminjaman::where('status', 'menunggu')->count();
         $nKembali = \App\Models\Pengembalian::where('status', 'menunggu')->count();
@@ -92,55 +120,59 @@
         $nData = \App\Models\Kendaraan::jumlahHampirHabis(90);
     }
 @endphp
-<div class="app">
-    <nav class="side" style="background:{{ $admin ? '#0B2F5B' : '#0F4C5C' }}">
-        <b class="brand">SIMOVDIN</b>
-        <div class="sub">{{ $admin ? 'Panel Admin' : 'Portal Seksi' }} &middot; KPKNL Bandung</div>
+<div class="app" style="--side:{{ $admin ? '#0B2F5B' : '#0F4C5C' }}">
+    <nav class="side">
+        <div class="brand">
+            <span class="bi">{!! $svg('truck') !!}</span>
+            <span><b>SIMOVDIN</b><small>{{ $admin ? 'Panel Admin' : 'Portal Seksi' }} &middot; KPKNL Bandung</small></span>
+        </div>
 
+        <div class="navs">
         @if ($admin)
-            <a href="{{ route('admin.dashboard') }}" class="{{ $on('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ route('admin.dashboard') }}" class="{{ $on('admin.dashboard') }}">{!! $ic('grid') !!}<span class="lb">Dashboard</span></a>
 
             <details {{ request()->routeIs('admin.peminjaman.*', 'admin.pengembalian.*') ? 'open' : '' }}>
-                <summary><span class="t">Persetujuan</span>@if ($nPinjam + $nKembali)<span class="nb">{{ $nPinjam + $nKembali }}</span>@endif</summary>
-                <a href="{{ route('admin.peminjaman.index') }}" class="{{ $on('admin.peminjaman.*') }}">Peminjaman @if ($nPinjam)<span class="nb">{{ $nPinjam }}</span>@endif</a>
-                <a href="{{ route('admin.pengembalian.index') }}" class="{{ $on('admin.pengembalian.*') }}">Pengembalian @if ($nKembali)<span class="nb">{{ $nKembali }}</span>@endif</a>
+                <summary>{!! $ic('check') !!}<span class="lb">Persetujuan</span>@if ($nPinjam + $nKembali)<span class="nb">{{ $nPinjam + $nKembali }}</span>@endif</summary>
+                <a href="{{ route('admin.peminjaman.index') }}" class="{{ $on('admin.peminjaman.*') }}"><span class="lb">Peminjaman</span>@if ($nPinjam)<span class="nb">{{ $nPinjam }}</span>@endif</a>
+                <a href="{{ route('admin.pengembalian.index') }}" class="{{ $on('admin.pengembalian.*') }}"><span class="lb">Pengembalian</span>@if ($nKembali)<span class="nb">{{ $nKembali }}</span>@endif</a>
             </details>
 
             <details {{ request()->routeIs('admin.servis.*', 'admin.pajak.*', 'admin.bbm.*', 'admin.laporan.*') ? 'open' : '' }}>
-                <summary><span class="t">Operasional</span>@if ($nStnk + $nBpkb)<span class="nb">{{ $nStnk + $nBpkb }}</span>@endif</summary>
-                <a href="{{ route('admin.servis.index') }}" class="{{ $on('admin.servis.*') }}">Servis</a>
+                <summary>{!! $ic('layers') !!}<span class="lb">Operasional</span>@if ($nStnk + $nBpkb)<span class="nb">{{ $nStnk + $nBpkb }}</span>@endif</summary>
+                <a href="{{ route('admin.servis.index') }}" class="{{ $on('admin.servis.*') }}"><span class="lb">Servis</span></a>
                 <details {{ request()->routeIs('admin.pajak.*') ? 'open' : '' }}>
-                    <summary><span class="t">Pajak Kendaraan</span>@if ($nStnk + $nBpkb)<span class="nb">{{ $nStnk + $nBpkb }}</span>@endif</summary>
-                    <a href="{{ route('admin.pajak.index', 'stnk') }}" class="{{ request()->is('admin/pajak/stnk*') ? 'on' : '' }}">STNK @if ($nStnk)<span class="nb">{{ $nStnk }}</span>@endif</a>
-                    <a href="{{ route('admin.pajak.index', 'bpkb') }}" class="{{ request()->is('admin/pajak/bpkb*') ? 'on' : '' }}">BPKB @if ($nBpkb)<span class="nb">{{ $nBpkb }}</span>@endif</a>
+                    <summary><span class="lb">Pajak Kendaraan</span>@if ($nStnk + $nBpkb)<span class="nb">{{ $nStnk + $nBpkb }}</span>@endif</summary>
+                    <a href="{{ route('admin.pajak.index', 'stnk') }}" class="{{ request()->is('admin/pajak/stnk*') ? 'on' : '' }}"><span class="lb">STNK</span>@if ($nStnk)<span class="nb">{{ $nStnk }}</span>@endif</a>
+                    <a href="{{ route('admin.pajak.index', 'bpkb') }}" class="{{ request()->is('admin/pajak/bpkb*') ? 'on' : '' }}"><span class="lb">BPKB</span>@if ($nBpkb)<span class="nb">{{ $nBpkb }}</span>@endif</a>
                 </details>
-                <a href="{{ route('admin.bbm.index') }}" class="{{ $on('admin.bbm.*') }}">BBM</a>
+                <a href="{{ route('admin.bbm.index') }}" class="{{ $on('admin.bbm.*') }}"><span class="lb">BBM</span></a>
                 <details {{ request()->routeIs('admin.laporan.*') ? 'open' : '' }}>
-                    <summary><span class="t">Laporan</span></summary>
-                    <a href="{{ route('admin.laporan.tampil', 'servis') }}" class="{{ request()->is('admin/laporan/servis') ? 'on' : '' }}">Laporan Servis</a>
-                    <a href="{{ route('admin.laporan.tampil', 'stnk') }}" class="{{ request()->is('admin/laporan/stnk') ? 'on' : '' }}">Laporan Pembayaran STNK</a>
-                    <a href="{{ route('admin.laporan.tampil', 'bpkb') }}" class="{{ request()->is('admin/laporan/bpkb') ? 'on' : '' }}">Laporan Pembayaran BPKB</a>
-                    <a href="{{ route('admin.laporan.tampil', 'pemakaian-kendaraan') }}" class="{{ request()->is('admin/laporan/pemakaian-kendaraan') ? 'on' : '' }}">Laporan Pemakaian Kendaraan</a>
-                    <a href="{{ route('admin.laporan.tampil', 'pemakaian-seksi') }}" class="{{ request()->is('admin/laporan/pemakaian-seksi') ? 'on' : '' }}">Laporan Pemakaian Seksi</a>
+                    <summary><span class="lb">Laporan</span></summary>
+                    <a href="{{ route('admin.laporan.tampil', 'servis') }}" class="{{ request()->is('admin/laporan/servis') ? 'on' : '' }}"><span class="lb">Laporan Servis</span></a>
+                    <a href="{{ route('admin.laporan.tampil', 'stnk') }}" class="{{ request()->is('admin/laporan/stnk') ? 'on' : '' }}"><span class="lb">Laporan Pembayaran STNK</span></a>
+                    <a href="{{ route('admin.laporan.tampil', 'bpkb') }}" class="{{ request()->is('admin/laporan/bpkb') ? 'on' : '' }}"><span class="lb">Laporan Pembayaran BPKB</span></a>
+                    <a href="{{ route('admin.laporan.tampil', 'pemakaian-kendaraan') }}" class="{{ request()->is('admin/laporan/pemakaian-kendaraan') ? 'on' : '' }}"><span class="lb">Laporan Pemakaian Kendaraan</span></a>
+                    <a href="{{ route('admin.laporan.tampil', 'pemakaian-seksi') }}" class="{{ request()->is('admin/laporan/pemakaian-seksi') ? 'on' : '' }}"><span class="lb">Laporan Pemakaian Seksi</span></a>
                 </details>
             </details>
 
             <details {{ request()->routeIs('admin.kendaraan.*', 'admin.pengemudi.*', 'admin.pengguna.*') ? 'open' : '' }}>
-                <summary><span class="t">Data</span>@if ($nData)<span class="nb">{{ $nData }}</span>@endif</summary>
-                <a href="{{ route('admin.kendaraan.index') }}" class="{{ $on('admin.kendaraan.*') }}">Kendaraan</a>
-                <a href="{{ route('admin.pengemudi.index') }}" class="{{ $on('admin.pengemudi.*') }}">Pengemudi</a>
-                <a href="{{ route('admin.pengguna.index') }}" class="{{ $on('admin.pengguna.*') }}">Pengguna</a>
+                <summary>{!! $ic('db') !!}<span class="lb">Data</span>@if ($nData)<span class="nb">{{ $nData }}</span>@endif</summary>
+                <a href="{{ route('admin.kendaraan.index') }}" class="{{ $on('admin.kendaraan.*') }}"><span class="lb">Kendaraan</span></a>
+                <a href="{{ route('admin.pengemudi.index') }}" class="{{ $on('admin.pengemudi.*') }}"><span class="lb">Pengemudi</span></a>
+                <a href="{{ route('admin.pengguna.index') }}" class="{{ $on('admin.pengguna.*') }}"><span class="lb">Pengguna</span></a>
             </details>
         @else
-            <a href="{{ route('pegawai.beranda') }}" class="{{ $on('pegawai.beranda') }}">Beranda</a>
-            <a href="{{ route('pegawai.peminjaman.create') }}" class="{{ $on('pegawai.peminjaman.create') }}">Ajukan Peminjaman</a>
-            <a href="{{ route('pegawai.peminjaman.index') }}" class="{{ request()->routeIs('pegawai.peminjaman.index', 'pegawai.pengembalian.*') ? 'on' : '' }}">Riwayat Saya</a>
+            <a href="{{ route('pegawai.beranda') }}" class="{{ $on('pegawai.beranda') }}">{!! $ic('home') !!}<span class="lb">Beranda</span></a>
+            <a href="{{ route('pegawai.peminjaman.create') }}" class="{{ $on('pegawai.peminjaman.create') }}">{!! $ic('plus') !!}<span class="lb">Ajukan Peminjaman</span></a>
+            <a href="{{ route('pegawai.peminjaman.index') }}" class="{{ $on('pegawai.peminjaman.index', 'pegawai.pengembalian.*') }}">{!! $ic('clock') !!}<span class="lb">Riwayat Saya</span></a>
         @endif
+        </div>
 
         <div class="bawah">
             <a href="{{ route('profil.show') }}" class="prof {{ $on('profil.*') }}">
-                <span class="av">{{ strtoupper(mb_substr($u->nama_seksi, 0, 1)) }}</span>
-                <span><b>{{ $u->nama_seksi }}</b><br><small>{{ $u->label_peran }} &middot; Profil</small></span>
+                <span class="av">{{ $inisial }}</span>
+                <span><b>{{ $u->nama_seksi }}</b><small>{{ $u->label_peran }}</small></span>
             </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
