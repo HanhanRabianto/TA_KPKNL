@@ -11,19 +11,28 @@ use Illuminate\View\View;
 
 class PenggunaController extends Controller
 {
+    public const SANDI_RESET = 'sementara123';
+
     public function index(Request $request): View
     {
         $q = trim((string) $request->query('q', ''));
+        $peran = in_array($request->query('peran'), ['admin', 'pegawai'], true) ? $request->query('peran') : '';
 
         $pengguna = User::query()
             ->when($q !== '', fn ($w) => $w->where(function ($s) use ($q) {
                 $s->where('nama_seksi', 'like', "%{$q}%")->orWhere('username', 'like', "%{$q}%");
             }))
+            ->when($peran !== '', fn ($w) => $w->where('peran', $peran))
             ->orderBy('peran')
             ->orderBy('nama_seksi')
             ->get();
 
-        return view('admin.pengguna.index', compact('pengguna', 'q'));
+        return view('admin.pengguna.index', [
+            'pengguna'   => $pengguna,
+            'q'          => $q,
+            'peran'      => $peran,
+            'jumlahSeksi' => User::where('peran', 'pegawai')->count(),
+        ]);
     }
 
     public function create(): View
@@ -36,15 +45,16 @@ class PenggunaController extends Controller
         $data = $request->validate([
             'nama_seksi' => ['required', 'string', 'max:100'],
             'username'   => ['required', 'string', 'max:50', 'alpha_dash', 'unique:pengguna,username'],
-            'password'   => ['required', 'string', 'min:6', 'confirmed'],
             'peran'      => ['required', Rule::in(['admin', 'pegawai'])],
+            'email'      => ['nullable', 'email', 'max:100'],
+            'password'   => ['required', 'string', 'min:6'],
         ], $this->pesan());
 
-        $data['aktif'] = $request->boolean('aktif');
+        $data['aktif'] = true;
 
         User::create($data);
 
-        return redirect()->route('admin.pengguna.index')->with('ok', 'Pengguna berhasil ditambahkan.');
+        return redirect()->route('admin.pengguna.index')->with('ok', 'Data pengguna tersimpan.');
     }
 
     public function edit(User $pengguna): View
@@ -57,11 +67,11 @@ class PenggunaController extends Controller
         $data = $request->validate([
             'nama_seksi' => ['required', 'string', 'max:100'],
             'username'   => ['required', 'string', 'max:50', 'alpha_dash', Rule::unique('pengguna', 'username')->ignore($pengguna->id)],
-            'password'   => ['nullable', 'string', 'min:6', 'confirmed'],
             'peran'      => ['required', Rule::in(['admin', 'pegawai'])],
+            'aktif'      => ['required', 'in:0,1'],
         ], $this->pesan());
 
-        $data['aktif'] = $request->boolean('aktif');
+        $data['aktif'] = $data['aktif'] === '1';
 
         
         if ($pengguna->id === $request->user()->id) {
@@ -69,20 +79,26 @@ class PenggunaController extends Controller
             $data['peran'] = 'admin';
         }
 
-        
-        if (empty($data['password'])) {
-            unset($data['password']);
-        }
-
         $pengguna->update($data);
 
-        return redirect()->route('admin.pengguna.index')->with('ok', 'Data pengguna diperbarui.');
+        return redirect()->route('admin.pengguna.index')->with('ok', 'Data pengguna tersimpan.');
+    }
+
+    public function reset(User $pengguna): RedirectResponse
+    {
+        $pengguna->update(['password' => self::SANDI_RESET]);
+
+        return back()->with('ok', 'Kata sandi direset menjadi '.self::SANDI_RESET.'.');
     }
 
     public function destroy(Request $request, User $pengguna): RedirectResponse
     {
         if ($pengguna->id === $request->user()->id) {
-            return back()->with('err', 'Anda tidak dapat menghapus akun yang sedang dipakai.');
+            return back()->with('err', 'Akun yang sedang Anda pakai tidak bisa dihapus.');
+        }
+
+        if ($pengguna->peran === 'admin' && User::where('peran', 'admin')->count() <= 1) {
+            return back()->with('err', 'Admin terakhir tidak bisa dihapus.');
         }
 
         if (DB::table('peminjaman')->where('pengguna_id', $pengguna->id)->exists()) {
@@ -99,11 +115,11 @@ class PenggunaController extends Controller
         return [
             'nama_seksi.required' => 'Nama seksi wajib diisi.',
             'username.required'   => 'Username wajib diisi.',
-            'username.unique'     => 'Username sudah dipakai.',
+            'username.unique'     => 'Username sudah terdaftar.',
             'username.alpha_dash' => 'Username hanya boleh huruf, angka, strip, dan garis bawah.',
-            'password.required'   => 'Kata sandi wajib diisi.',
+            'email.email'         => 'Format email tidak valid.',
+            'password.required'   => 'Kata sandi sementara wajib diisi.',
             'password.min'        => 'Kata sandi minimal 6 karakter.',
-            'password.confirmed'  => 'Konfirmasi kata sandi tidak sama.',
             'peran.in'            => 'Peran tidak valid.',
         ];
     }

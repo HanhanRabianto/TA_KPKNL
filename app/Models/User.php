@@ -2,23 +2,30 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
+    use Notifiable;
+
     protected $table = 'pengguna';
-    protected $fillable = ['nama_seksi', 'username', 'password', 'peran', 'aktif'];
+
+    protected $fillable = ['nama_seksi', 'username', 'email', 'no_hp', 'password', 'peran', 'aktif'];
+
     protected $hidden = ['password', 'remember_token'];
+
     protected function casts(): array
     {
-        return ['password' => 'hashed'];
+        return [
+            'password' => 'hashed',
+            'aktif'    => 'boolean',
+        ];
+    }
+
+    // di tampilan, peran "pegawai" ditulis "Seksi"
+    public function getLabelPeranAttribute(): string
+    {
+        return $this->peran === 'admin' ? 'Admin' : 'Seksi';
     }
 }

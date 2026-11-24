@@ -10,18 +10,16 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-    \App\Models\User::create([
-    'nama_seksi' => 'Admin Kendaraan',
-    'username'   => 'admin',
-    'password'   => 'admin123',
-    'peran'      => 'admin',
-    ]);
-    
-    $this->call(DataContohSeeder::class);
+        
+        User::create([
+            'nama_seksi' => 'Admin Kendaraan',
+            'username'   => 'admin',
+            'password'   => 'admin123',
+            'peran'      => 'admin',
+        ]);
+
+        $this->call(DataContohSeeder::class);
     }
 }

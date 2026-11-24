@@ -47,7 +47,6 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
             'pengembalianMenunggu' => Pengembalian::where('status', 'menunggu')->count(),
             'stnkTempo' => Kendaraan::jumlahJatuhTempo('stnk_berlaku'),
             'bpkbTempo' => Kendaraan::jumlahJatuhTempo('bpkb_berlaku'),
-            
             'pajakTempo' => Kendaraan::orderBy('plat')->get()
                 ->flatMap(fn ($k) => collect([['STNK', 'stnk_berlaku', 'stnk'], ['BPKB', 'bpkb_berlaku', 'bpkb']])
                     ->map(fn ($j) => ['k' => $k, 'jenis' => $j[0], 'tgl' => $k->{$j[1]}, 'sisa' => $k->sisaHari($j[1]), 'slug' => $j[2]]))
@@ -57,7 +56,7 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
         ]);
     })->name('dashboard');
 
-   
+    
     Route::get('/peminjaman', [VerifikasiPeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('/peminjaman/{peminjaman}', [VerifikasiPeminjamanController::class, 'show'])->whereNumber('peminjaman')->name('peminjaman.show');
     Route::post('/peminjaman/{peminjaman}/setujui', [VerifikasiPeminjamanController::class, 'setujui'])->name('peminjaman.setujui');
@@ -82,7 +81,7 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     Route::get('/pajak/{jenis}/{kendaraan}/bayar', [PajakController::class, 'formBayar'])->whereIn('jenis', ['stnk', 'bpkb'])->name('pajak.bayar');
     Route::post('/pajak/{jenis}/{kendaraan}/bayar', [PajakController::class, 'bayar'])->whereIn('jenis', ['stnk', 'bpkb'])->name('pajak.simpan');
 
-   
+    
     Route::get('/bbm', [BbmController::class, 'index'])->name('bbm.index');
     Route::get('/bbm/catat', [BbmController::class, 'create'])->name('bbm.create');
     Route::post('/bbm', [BbmController::class, 'store'])->name('bbm.store');
@@ -95,6 +94,7 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
     
     Route::resource('kendaraan', KendaraanController::class)->except('show');
     Route::resource('pengemudi', PengemudiController::class)->except('show');
+    Route::post('/pengguna/{pengguna}/reset', [PenggunaController::class, 'reset'])->name('pengguna.reset');
     Route::resource('pengguna', PenggunaController::class)->except('show');
 });
 
