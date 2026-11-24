@@ -2,19 +2,35 @@
 @section('judul', 'Pengajuan Peminjaman')
 
 @php
-    // nilai awal: old() lebih diutamakan, lalu data pengajuan lama (ajukan lagi)
+    // nilai awal: old() lebih diutamakan, lalu data pengajuan lama (ajukan ulang)
     $v = fn ($k, $default = null) => old($k, $isi?->{$k} ?? $default);
+    $keteranganBlokir = [
+        'menunggu'        => 'masih menunggu persetujuan.',
+        'disetujui'       => 'sudah disetujui. Kembalikan kendaraan dan isi laporan pemakaian terlebih dahulu.',
+        'verifikasi'      => 'laporan pengembaliannya sedang diverifikasi.',
+        'kembali_ditolak' => 'laporan pengembaliannya ditolak. Perbaiki laporan lalu ajukan kembali.',
+    ];
 @endphp
 
 @section('isi')
-    <h2 style="margin-bottom:2px">Pengajuan Peminjaman</h2>
-    <p class="note" style="margin-top:0">Isi data perjalanan dinas, lalu kirim untuk persetujuan</p>
+    @include('partials.judul', ['judul' => 'Pengajuan Peminjaman', 'sub' => 'Isi data perjalanan dinas, lalu kirim untuk persetujuan'])
 
-    @if ($blokir)
-        <div class="flash err">
-            <strong>Belum bisa mengajukan peminjaman baru.</strong><br>{{ $blokir }}
+    @if ($penghalang)
+        <div class="card" style="max-width:720px">
+            <h3 style="margin-top:0">Belum bisa mengajukan peminjaman baru</h3>
+            @if ($penghalang->status !== 'kembali_ditolak')
+                <p>Anda sudah meminjam maksimal {{ \App\Models\Peminjaman::MAKS_AKTIF }} kendaraan.</p>
+            @endif
+            <p>
+                Peminjaman Anda untuk <strong>{{ $penghalang->tujuan }}</strong> ({{ $penghalang->mulai->format('d/m/Y') }})
+                {{ $keteranganBlokir[$penghalang->status] ?? '' }}
+            </p>
+            <p class="note">Pengajuan baru dibuka setelah pengembalian kendaraan diterima admin.</p>
+            <a class="btn" href="{{ route('pegawai.peminjaman.index') }}">Lihat Riwayat Saya</a>
+            @if ($penghalang->status === 'kembali_ditolak')
+                <a class="btn d" href="{{ route('pegawai.pengembalian.create', $penghalang) }}">Perbaiki Laporan</a>
+            @endif
         </div>
-        <a class="btn s" href="{{ route('pegawai.peminjaman.index') }}">Lihat Riwayat Saya</a>
     @else
         <div class="card" style="max-width:720px">
             <form method="POST" action="{{ route('pegawai.peminjaman.store') }}">
@@ -51,8 +67,7 @@
                 <div class="row">
                     <div>
                         <label for="tanggal_mulai">Tanggal mulai</label>
-                        <input id="tanggal_mulai" type="date" name="tanggal_mulai" min="{{ now()->format('Y-m-d') }}"
-                               value="{{ old('tanggal_mulai') }}" required>
+                        <input id="tanggal_mulai" type="date" name="tanggal_mulai" min="{{ now()->format('Y-m-d') }}" value="{{ old('tanggal_mulai') }}" required>
                         @error('tanggal_mulai') <div class="ferr">{{ $message }}</div> @enderror
                     </div>
                     <div>
@@ -65,23 +80,20 @@
                 <div class="row">
                     <div>
                         <label for="penumpang">Jumlah penumpang</label>
-                        <input id="penumpang" type="number" min="1" max="20" name="penumpang" value="{{ $v('penumpang', 1) }}" required>
+                        <input id="penumpang" type="number" min="1" max="60" name="penumpang" value="{{ $v('penumpang', 1) }}" required>
                         @error('penumpang') <div class="ferr">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label for="kendaraan_id">Kendaraan (hanya yang tersedia)</label>
                         <select id="kendaraan_id" name="kendaraan_id" required>
-                            <option value="">Pilih kendaraan</option>
+                            <option value="">{{ $kendaraan->isEmpty() ? 'Tidak ada kendaraan tersedia' : 'Pilih kendaraan' }}</option>
                             @foreach ($kendaraan as $k)
-                                <option value="{{ $k->id }}" @selected($v('kendaraan_id') == $k->id)>{{ $k->jenis }}, {{ $k->plat }}</option>
+                                <option value="{{ $k->id }}" @selected($v('kendaraan_id') == $k->id)>{{ $k->plat }} - {{ $k->jenis }} (kapasitas {{ $k->kapasitas }})</option>
                             @endforeach
                         </select>
                         @error('kendaraan_id') <div class="ferr">{{ $message }}</div> @enderror
                     </div>
                 </div>
-                @if ($kendaraan->isEmpty())
-                    <div class="flash err" style="margin-top:8px">Saat ini tidak ada kendaraan yang tersedia. Coba lagi nanti.</div>
-                @endif
 
                 <label for="pengemudi_id">Pengemudi (pilih sendiri atau tanpa pengemudi)</label>
                 <select id="pengemudi_id" name="pengemudi_id">

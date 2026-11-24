@@ -1,45 +1,53 @@
 @extends('layouts.app')
-@section('judul', 'Laporan Pengembalian')
+@section('judul', 'Laporan Pemakaian')
 
 @php
     $ulang = $pengembalian && $pengembalian->status === 'ditolak';
     $v = fn ($k, $default = null) => old($k, $pengembalian?->{$k} ?? $default);
-    $kembali = old('kembali_pada', $pengembalian?->kembali_pada?->format('Y-m-d\TH:i'));
+    $tanggal = old('tanggal_kembali', $pengembalian?->kembali_pada?->format('Y-m-d') ?? now()->format('Y-m-d'));
+    $jam = old('jam_kembali', $pengembalian?->kembali_pada?->format('H:i') ?? now()->format('H:i'));
 @endphp
 
 @section('isi')
-    <h2>{{ $ulang ? 'Ajukan Kembali Laporan Pengembalian' : 'Laporan Pengembalian Kendaraan' }}</h2>
+    @include('partials.judul', [
+        'judul' => $ulang ? 'Perbaiki Laporan Pemakaian' : 'Lapor Pemakaian',
+        'sub'   => 'Isi data setelah kendaraan dikembalikan',
+    ])
 
-    @if ($ulang)
-        <div class="flash err"><strong>Laporan sebelumnya ditolak.</strong><br>Alasan: {{ $pengembalian->alasan_tolak }}</div>
-    @endif
+    <div class="card" style="max-width:720px">
+        <div class="flash info">
+            Perjalanan: {{ $p->mulai->format('d/m/Y') }} &middot; {{ $p->tujuan }} ({{ $p->kendaraan->plat }})
+        </div>
 
-    <div class="card" style="max-width:760px">
-        <p>
-            <strong>{{ $p->kendaraan->plat }} - {{ $p->kendaraan->jenis }}</strong><br>
-            {{ $p->tujuan }} | mulai {{ $p->mulai->format('d/m/Y H:i') }}
-        </p>
+        @if ($ulang)
+            <div class="flash err"><strong>Laporan sebelumnya ditolak.</strong> Alasan: {{ $pengembalian->alasan_tolak }}</div>
+        @endif
 
         <form method="POST" action="{{ route('pegawai.pengembalian.store', $p) }}">
             @csrf
 
             <div class="row">
                 <div>
-                    <label for="odometer_awal">Odometer awal (otomatis)</label>
+                    <label for="tanggal_kembali">Tanggal kembali</label>
+                    <input id="tanggal_kembali" type="date" name="tanggal_kembali" min="{{ $p->mulai->format('Y-m-d') }}" value="{{ $tanggal }}" required>
+                    @error('tanggal_kembali') <div class="ferr">{{ $message }}</div> @enderror
+                </div>
+                <div>
+                    <label for="jam_kembali">Jam kembali</label>
+                    <input id="jam_kembali" type="time" name="jam_kembali" value="{{ $jam }}" required>
+                    @error('jam_kembali') <div class="ferr">{{ $message }}</div> @enderror
+                </div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <label for="odometer_awal">Odometer awal (otomatis dari sistem)</label>
                     <input id="odometer_awal" value="{{ $p->kendaraan->odometer }}" readonly>
                 </div>
                 <div>
                     <label for="odometer_akhir">Odometer akhir (km)</label>
-                    <input id="odometer_akhir" type="number" min="{{ $p->kendaraan->odometer }}" name="odometer_akhir"
-                           value="{{ $v('odometer_akhir') }}" required>
+                    <input id="odometer_akhir" type="number" min="{{ $p->kendaraan->odometer }}" name="odometer_akhir" value="{{ $v('odometer_akhir') }}" required>
                     @error('odometer_akhir') <div class="ferr">{{ $message }}</div> @enderror
-                </div>
-                <div>
-                    <label for="kembali_pada">Tanggal dan jam kembali</label>
-                    <input id="kembali_pada" type="datetime-local" name="kembali_pada"
-                           min="{{ $p->mulai->format('Y-m-d\TH:i') }}"
-                           value="{{ $kembali }}" required>
-                    @error('kembali_pada') <div class="ferr">{{ $message }}</div> @enderror
                 </div>
             </div>
 
@@ -58,8 +66,8 @@
             </div>
 
             <div style="margin-top:16px">
-                <button class="btn" type="submit">{{ $ulang ? 'Kirim Ulang' : 'Kirim Laporan' }}</button>
-                <a class="btn s" href="{{ route('pegawai.peminjaman.index', ['tab' => 'diterima']) }}">Batal</a>
+                <button class="btn" type="submit">Kirim Laporan dan Ajukan Pengembalian</button>
+                <a class="btn s" href="{{ route('pegawai.peminjaman.index') }}">Batal</a>
             </div>
         </form>
     </div>

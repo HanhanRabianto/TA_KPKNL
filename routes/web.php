@@ -8,11 +8,13 @@ use App\Http\Controllers\Admin\VerifikasiPeminjamanController;
 use App\Http\Controllers\Admin\VerifikasiPengembalianController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KendaraanController;
+use App\Http\Controllers\Pegawai\BerandaController;
 use App\Http\Controllers\Pegawai\PeminjamanController;
 use App\Http\Controllers\Pegawai\PengembalianController;
 use App\Http\Controllers\PengemudiController;
 use App\Http\Controllers\SuratTugasController;
 use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\ProfilController;
 use App\Models\Kendaraan;
 use App\Models\Peminjaman;
 use App\Models\Pengembalian;
@@ -28,6 +30,13 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profil', [ProfilController::class, 'show'])->name('profil.show');
+    Route::post('/profil', [ProfilController::class, 'simpan'])->name('profil.simpan');
+    Route::post('/profil/sandi', [ProfilController::class, 'sandi'])->name('profil.sandi');
+});
 
 
 Route::get('/surat-tugas/{peminjaman}', [SuratTugasController::class, 'show'])->middleware('auth')->whereNumber('peminjaman')->name('surat-tugas.show');
@@ -100,24 +109,14 @@ Route::middleware(['auth', 'peran:admin'])->prefix('admin')->name('admin.')->gro
 
 // ---------------- Pegawai ----------------
 Route::middleware(['auth', 'peran:pegawai'])->prefix('pegawai')->name('pegawai.')->group(function () {
-    Route::get('/beranda', function () {
-        $uid = auth()->id();
+    Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
 
-        return view('pegawai.beranda', [
-            'aktif'   => Peminjaman::jumlahAktif($uid),
-            'maks'    => Peminjaman::MAKS_AKTIF,
-            'blokir'  => Peminjaman::alasanBlokir($uid),
-            'menunggu' => Peminjaman::where('pengguna_id', $uid)->where('status', 'menunggu')->count(),
-            'selesai' => Peminjaman::where('pengguna_id', $uid)->where('status', 'selesai')->count(),
-        ]);
-    })->name('beranda');
-
+    
     Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('/peminjaman/buat', [PeminjamanController::class, 'create'])->name('peminjaman.create');
     Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
 
     
-    Route::get('/pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.index');
     Route::get('/peminjaman/{peminjaman}/pengembalian', [PengembalianController::class, 'create'])->name('pengembalian.create');
     Route::post('/peminjaman/{peminjaman}/pengembalian', [PengembalianController::class, 'store'])->name('pengembalian.store');
 });
