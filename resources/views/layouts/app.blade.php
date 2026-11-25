@@ -6,9 +6,10 @@
     <title>@yield('judul', 'SIMOVDIN') - KPKNL Bandung</title>
     <style>
         :root { --pr:#0b3d91; --pr2:#e8eefb; --bg:#f4f6fa; --card:#fff; --tx:#1b2433; --mu:#6b7686; --bd:#dde3ec;
-                --ok:#127a3d; --okb:#e0f5e8; --wr:#a76400; --wrb:#fff1d6; --er:#b42318; --erb:#fde4e1; }
+                --ok:#127a3d; --okb:#e0f5e8; --wr:#a76400; --wrb:#fff1d6; --er:#b42318; --erb:#fde4e1;
+                --pg:#f4f6fa; --hd:#f8fafc; --sh:0 1px 2px rgba(16,24,40,.04),0 6px 16px rgba(16,24,40,.05); }
         * { box-sizing: border-box; }
-        body { margin:0; font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--tx); }
+        body { margin:0; font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--pg); color:var(--tx); }
         a { color:var(--pr); }
 
         .app { display:flex; min-height:100vh; }
@@ -43,50 +44,73 @@
         nav.side form { margin:0; }
         nav.side .keluar { width:100%; min-height:44px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); border-radius:10px; font:inherit; font-weight:700; cursor:pointer; }
         nav.side .keluar:hover { background:rgba(255,255,255,.08); }
-        .main { flex:1; min-width:0; padding:24px; max-width:1240px; }
+        .col { flex:1; min-width:0; display:flex; flex-direction:column; }
+        .top { display:flex; align-items:center; gap:16px; padding:14px 32px; background:var(--card); border-bottom:1px solid var(--bd); position:sticky; top:0; z-index:5; }
+        .sr { flex:1; max-width:680px; display:flex; align-items:center; gap:10px; background:var(--hd); border:1px solid var(--bd); border-radius:12px; padding:0 14px; min-height:46px; color:var(--mu); margin:0; }
+        .sr:focus-within { outline:3px solid #6FA8E8; outline-offset:1px; }
+        .sr svg { width:18px; height:18px; flex-shrink:0; }
+        .sr input { border:0; background:transparent; min-height:44px; padding:0; flex:1; color:var(--tx); outline:none; border-radius:0; width:auto; }
+        .tr { display:flex; align-items:center; gap:12px; margin-left:auto; }
+        .ib { position:relative; width:42px; height:42px; border-radius:12px; border:1px solid var(--bd); background:var(--card); color:var(--pr); display:flex; align-items:center; justify-content:center; text-decoration:none; }
+        .ib svg { width:19px; height:19px; }
+        .dot { position:absolute; top:-7px; right:-7px; background:#E5484D; color:#fff; font:700 11px/1 system-ui,sans-serif; font-style:normal; min-width:19px; height:19px; border-radius:99px; display:flex; align-items:center; justify-content:center; padding:0 5px; }
+        .av.ac { width:40px; height:40px; border-radius:50%; background:var(--side,#0B2F5B); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; text-decoration:none; }
+        .main { flex:1; min-width:0; padding:30px 32px; display:flex; flex-direction:column; gap:20px; }
 
-        h1 { font-size:22px; margin:0; } h2 { font-size:18px; margin:0 0 12px; } h3 { font-size:15px; margin:18px 0 8px; }
-        .head { margin-bottom:16px; } .head .note { margin-top:2px; }
-        .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; margin-bottom:16px; }
-        .card { background:var(--card); border:1px solid var(--bd); border-radius:10px; padding:16px; margin-bottom:14px; }
-        .grid .card { margin:0; border-left-width:4px; }
+        h1 { font-size:28px; font-weight:800; margin:0; letter-spacing:-.01em; } h2 { font-size:17px; font-weight:700; margin:0; } h3 { font-size:15px; margin:0; }
+        .head .note { margin-top:6px; font-size:14px; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; }
+        .card, .pn { background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:20px; box-shadow:var(--sh); }
+        .pn { display:flex; flex-direction:column; gap:14px; } .pn > .card { box-shadow:none; background:var(--hd); }
+        .card > h3 + .tw, .card > h3 + p { margin-top:12px; }
+        .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; }
+        .st { display:flex; align-items:center; gap:16px; }
+        .ico { width:56px; height:56px; border-radius:16px; background:var(--pr2); color:var(--pr); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ico svg { width:26px; height:26px; }
+        .k { font-size:13px; color:var(--tx); font-weight:600; } .v { font-size:32px; font-weight:800; color:var(--pr); line-height:1.15; }
         .num { font-size:28px; font-weight:700; color:var(--pr); } .lbl { color:var(--mu); font-size:12px; }
-        .btn { display:inline-block; background:var(--pr); color:#fff; border:0; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none; }
-        .btn.s { background:var(--pr2); color:var(--pr); } .btn.d { background:var(--er); color:#fff; } .btn.w { background:#fff; color:var(--pr); border:1px solid var(--bd); }
+        .btn { display:inline-flex; align-items:center; justify-content:center; background:var(--pr); color:#fff; border:1px solid transparent; padding:10px 18px; min-height:44px; border-radius:10px; cursor:pointer; font:inherit; font-weight:700; font-size:14px; text-decoration:none; }
+        .btn.s { background:var(--pr2); color:var(--pr); } .btn.d { background:var(--er); color:#fff; } .btn.w { background:var(--card); color:var(--tx); border:1px solid var(--bd); }
         .btn:disabled { opacity:.5; cursor:not-allowed; }
-        .bar { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
-        .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; align-items:center; }
-        .tw { overflow-x:auto; } table { width:100%; border-collapse:collapse; font-size:13px; }
-        th, td { text-align:left; padding:9px 8px; border-bottom:1px solid var(--bd); vertical-align:top; }
-        th { color:var(--mu); font-size:12px; font-weight:600; }
-        .b { display:inline-block; padding:2px 9px; border-radius:99px; font-size:12px; font-weight:600; }
+        td .btn, .tw .btn { min-height:34px; padding:6px 12px; font-size:13px; }
+        .bar { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+        .bar > div:last-child { display:flex; gap:10px; flex-wrap:wrap; }
+        .chips { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+        .tw { overflow-x:auto; background:var(--card); border:1px solid var(--bd); border-radius:14px; }
+        table { width:100%; border-collapse:collapse; font-size:13px; min-width:640px; }
+        th { text-align:left; color:var(--mu); font-weight:600; font-size:12.5px; padding:12px 16px; background:var(--hd); border-bottom:1px solid var(--bd); white-space:nowrap; }
+        td { text-align:left; padding:14px 16px; border-bottom:1px solid var(--bd); vertical-align:top; }
+        tr:last-child td { border-bottom:0; }
+        .b { display:inline-block; padding:4px 10px; border-radius:99px; font-size:12px; font-weight:700; white-space:nowrap; }
         .b.ok { background:var(--okb); color:var(--ok); } .b.wr { background:var(--wrb); color:var(--wr); } .b.er { background:var(--erb); color:var(--er); } .b.in { background:var(--pr2); color:var(--pr); }
         .note { color:var(--mu); font-size:12px; }
-        .flash { padding:10px 12px; border-radius:8px; margin-bottom:14px; }
+        .flash { padding:10px 12px; border-radius:8px; }
         .flash.ok { background:var(--okb); color:var(--ok); } .flash.err { background:var(--erb); color:var(--er); } .flash.info { background:#e9edf3; color:#3d4a5c; }
         label { display:block; font-size:12px; color:var(--mu); margin:12px 0 4px; }
-        input, select, textarea { width:100%; padding:9px; border:1px solid var(--bd); border-radius:8px; font:inherit; background:#fff; color:var(--tx); }
+        input, select, textarea { width:100%; padding:9px; border:1px solid var(--bd); border-radius:10px; font:inherit; background:#fff; color:var(--tx); }
         input[readonly] { background:#eef1f6; color:var(--mu); }
         .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0 14px; }
         .ferr { color:var(--er); font-size:12px; margin-top:3px; }
-        .bars { display:flex; align-items:flex-end; gap:10px; height:190px; padding-top:8px; }
-        .bars > div { flex:1; text-align:center; font-size:11px; color:var(--mu); display:flex; flex-direction:column; justify-content:flex-end; align-items:center; }
-        .bars i { display:block; width:100%; background:var(--pr); border-radius:4px 4px 0 0; margin:4px 0; }
+        .bars { display:flex; align-items:flex-end; gap:14px; height:220px; margin-top:14px; padding:0 4px; border-bottom:1px solid var(--bd); }
+        .bars > div { flex:1; max-width:84px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; font-size:12px; height:100%; }
+        .bars > div span { position:relative; top:22px; margin-top:-18px; color:var(--mu); }
+        .bars i { display:block; width:100%; background:var(--pr); border-radius:8px 8px 0 0; }
         .dl { display:grid; grid-template-columns:190px 1fr; gap:6px 12px; margin:10px 0; } .dl dt { color:var(--mu); } .dl dd { margin:0; }
 
         .print-only { display:none; }
         @media print {
-            nav.side, .no-print, .flash { display:none !important; }
+            nav.side, .top, .no-print, .flash { display:none !important; }
             .print-only { display:block !important; }
             td.print-only, span.print-only { display:inline !important; }
             .app { display:block; } .main { padding:0; max-width:none; }
-            body { background:#fff; } .card { border:0; padding:0; }
+            body { background:#fff; } .card, .pn { border:0; padding:0; box-shadow:none; }
         }
         @media (max-width:860px) {
             .app { flex-direction:column; }
             nav.side { width:100%; height:auto; position:static; align-self:stretch; overflow:visible; }
             nav.side .navs { flex-direction:row; flex-wrap:wrap; }
             nav.side details { width:100%; }
+            .top, .main { padding-left:20px; padding-right:20px; }
             .dl { grid-template-columns:1fr; }
         }
     </style>
@@ -97,18 +121,7 @@
     $admin = $u->peran === 'admin';
     $on = fn (string ...$pola) => request()->routeIs(...$pola) ? 'on' : '';
 
-    // ikon sidebar (garis, mengikuti warna teks)
-    $ikon = [
-        'grid'   => '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
-        'check'  => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
-        'layers' => '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
-        'db'     => '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
-        'home'   => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
-        'plus'   => '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
-        'clock'  => '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
-        'truck'  => '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
-    ];
-    $svg = fn (string $n) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$ikon[$n].'</svg>';
+    $svg = fn (string $n) => \App\Support\Ikon::svg($n);
     $ic = fn (string $n) => '<span class="ic">'.$svg($n).'</span>';
     $inisial = mb_strtoupper(collect(preg_split('/\s+/', trim($u->nama_seksi)))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode(''));
 
@@ -118,6 +131,12 @@
         $nStnk = \App\Models\Kendaraan::jumlahJatuhTempo('stnk_berlaku');
         $nBpkb = \App\Models\Kendaraan::jumlahJatuhTempo('bpkb_berlaku');
         $nData = \App\Models\Kendaraan::jumlahHampirHabis(90);
+        $lonceng = ['n' => $nPinjam + $nKembali, 'url' => route($nPinjam || ! $nKembali ? 'admin.peminjaman.index' : 'admin.pengembalian.index')];
+    } else {
+        $lonceng = [
+            'n'   => \App\Models\Peminjaman::where('pengguna_id', $u->id)->whereIn('status', ['disetujui', 'kembali_ditolak'])->count(),
+            'url' => route('pegawai.peminjaman.index'),
+        ];
     }
 @endphp
 <div class="app" style="--side:{{ $admin ? '#0B2F5B' : '#0F4C5C' }}">
@@ -181,11 +200,32 @@
         </div>
     </nav>
 
-    <main class="main">
-        @if (session('ok')) <div class="flash ok">{{ session('ok') }}</div> @endif
-        @if (session('err')) <div class="flash err">{{ session('err') }}</div> @endif
-        @yield('isi')
-    </main>
+    <div class="col">
+        <header class="top">
+            <label class="sr">{!! $svg('search') !!}<input type="search" placeholder="{{ $admin ? 'Cari kendaraan, seksi, atau tujuan...' : 'Cari pengajuan, tujuan, atau kendaraan...' }}" oninput="cariTabel(this.value)" aria-label="Cari pada tabel di halaman ini"></label>
+            <div class="tr">
+                <a class="ib" href="{{ $lonceng['url'] }}" title="{{ $lonceng['n'] ? $lonceng['n'].' perlu ditindaklanjuti' : 'Tidak ada pemberitahuan' }}" aria-label="Pemberitahuan">{!! $svg('bell') !!}@if ($lonceng['n'])<i class="dot">{{ $lonceng['n'] }}</i>@endif</a>
+                <a class="av ac" href="{{ route('profil.show') }}" title="Profil" aria-label="Profil">{{ $inisial }}</a>
+            </div>
+        </header>
+
+        <main class="main">
+            @if (session('ok')) <div class="flash ok">{{ session('ok') }}</div> @endif
+            @if (session('err')) <div class="flash err">{{ session('err') }}</div> @endif
+            @yield('isi')
+        </main>
+    </div>
 </div>
+
+<script>
+    
+    function cariTabel(q) {
+        q = q.trim().toLowerCase();
+        document.querySelectorAll('.main table tr').forEach(function (r) {
+            if (r.querySelector('th')) return;
+            r.style.display = (!q || r.textContent.toLowerCase().indexOf(q) > -1) ? '' : 'none';
+        });
+    }
+</script>
 </body>
 </html>
