@@ -34,9 +34,18 @@
 
         @media (max-width: 800px) {
             .lg { flex-direction: column; }
-            .hero { padding: 28px; }
-            .logo img { height: 84px; }
-            .hero h1 { font-size: 30px; }
+            .hero { flex:0 0 auto; min-height:220px; padding:24px 20px; }
+            .logo { margin-bottom:6px; }
+            .logo img { height:96px; }
+            .hero p { max-width:340px; font-size:13px; }
+            .pane { align-items:flex-start; flex:1; padding:16px 12px calc(20px + env(safe-area-inset-bottom, 0)); }
+            .card { max-width:none; padding:20px 16px; border-radius:14px; }
+            .card h2 { font-size:22px; }
+        }
+        @media (max-width:480px) {
+            .hero { min-height:190px; }
+            .logo img { height:82px; }
+            .hero p { max-width:300px; }
         }
     </style>
 </head>
