@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Masuk - SIMOVDIN KPKNL Bandung</title>
+    <title>Masuk - KPKNL Bandung</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-kementerian-keuangan.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root { --pr:#0B2F5B; --tx:#1B2433; --mu:#4A5568; --bd:#DDE3EC; --pg:#F4F6FA; --rd:#FBE0E0; --rdt:#7A1B1B; }
