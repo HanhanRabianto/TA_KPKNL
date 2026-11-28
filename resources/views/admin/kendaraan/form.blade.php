@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @php
     $ubah = $kendaraan->exists;
-    $terkunci = $ubah && ! in_array($kendaraan->status, ['Tersedia', 'Rusak'], true);
+    $terkunci = $ubah && ! in_array($kendaraan->status, \App\Models\Kendaraan::STATUS_MANUAL, true);
 @endphp
 @section('judul', $ubah ? 'Ubah Kendaraan' : 'Tambah Kendaraan')
 
@@ -57,8 +57,8 @@
                         <input id="status" value="{{ $kendaraan->label_status }}" readonly>
                     @else
                         <select id="status" name="status">
-                            @foreach (['Tersedia' => 'Tersedia', 'Rusak' => 'Rusak'] as $nilai => $nama)
-                                <option value="{{ $nilai }}" @selected(old('status', $kendaraan->status) === $nilai)>{{ $nama }}</option>
+                            @foreach (\App\Models\Kendaraan::STATUS_MANUAL as $status)
+                                <option value="{{ $status }}" @selected(old('status', $kendaraan->status) === $status)>{{ $status }}</option>
                             @endforeach
                         </select>
                     @endif

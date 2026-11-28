@@ -28,7 +28,6 @@ class DashboardController extends Controller
             $statistik[] = ['nama' => $nama, 'n' => (int) ($perBulan[$i + 1] ?? 0)];
         }
 
-        
         $pajakTempo = Kendaraan::orderBy('plat')->get()
             ->flatMap(fn ($k) => collect([['STNK', 'stnk_berlaku', 'stnk'], ['BPKB', 'bpkb_berlaku', 'bpkb']])
                 ->map(fn ($j) => ['k' => $k, 'jenis' => $j[0], 'tgl' => $k->{$j[1]}, 'sisa' => $k->sisaHari($j[1]), 'slug' => $j[2]]))
@@ -38,25 +37,25 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', [
             'totalKendaraan' => (int) $status->sum(),
-            'tersedia'       => (int) ($status['Tersedia'] ?? 0),
-            'dipakai'        => (int) ($status['Sedang dipakai'] ?? 0),
-            'diservis'       => (int) ($status['Sedang diservis'] ?? 0),
-            'stnkTempo'      => Kendaraan::jumlahJatuhTempo('stnk_berlaku'),
-            'bpkbTempo'      => Kendaraan::jumlahJatuhTempo('bpkb_berlaku'),
+            'tersedia' => (int) ($status['Tersedia'] ?? 0),
+            'tidakTersedia' => (int) ($status['Tidak tersedia'] ?? 0),
+            'dipakai' => (int) ($status['Sedang dipakai'] ?? 0),
+            'diservis' => (int) ($status['Sedang diservis'] ?? 0),
+            'stnkTempo' => Kendaraan::jumlahJatuhTempo('stnk_berlaku'),
+            'bpkbTempo' => Kendaraan::jumlahJatuhTempo('bpkb_berlaku'),
             'totalPengemudi' => Pengemudi::count(),
             'pengemudiSedia' => Pengemudi::where('status', 'Tersedia')->count(),
-            'totalSeksi'     => User::where('peran', 'pegawai')->count(),
-            'menunggu'       => Peminjaman::with(['pengguna', 'kendaraan', 'pengemudi'])->where('status', 'menunggu')->orderBy('id')->get(),
-            'dipinjam'       => Peminjaman::with(['pengguna', 'kendaraan', 'pengemudi'])->whereIn('status', Peminjaman::STATUS_DIPINJAM)->orderBy('mulai')->get(),
-            'verifikasi'     => Pengembalian::with(['peminjaman.pengguna', 'peminjaman.kendaraan'])->where('status', 'menunggu')->orderBy('id')->get(),
+            'totalSeksi' => User::where('peran', 'pegawai')->count(),
+            'menunggu' => Peminjaman::with(['pengguna', 'kendaraan', 'pengemudi'])->where('status', 'menunggu')->orderBy('id')->get(),
+            'dipinjam' => Peminjaman::with(['pengguna', 'kendaraan', 'pengemudi'])->whereIn('status', Peminjaman::STATUS_DIPINJAM)->orderBy('mulai')->get(),
+            'verifikasi' => Pengembalian::with(['peminjaman.pengguna', 'peminjaman.kendaraan'])->where('status', 'menunggu')->orderBy('id')->get(),
             'servisBerjalan' => Servis::with('kendaraan')->where('status', 'Berjalan')->orderBy('tgl_masuk')->get(),
-            'pajakTempo'     => $pajakTempo,
-            'statistik'      => $statistik,
-            'tahun'          => now()->year,
+            'pajakTempo' => $pajakTempo,
+            'statistik' => $statistik,
+            'tahun' => now()->year,
         ]);
     }
 
-    
     public static function durasi(Carbon $dari): string
     {
         $m = max(0, (int) round($dari->diffInMinutes(now(), false)));

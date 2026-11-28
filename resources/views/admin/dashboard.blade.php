@@ -14,6 +14,7 @@
         @include('partials.kartu', ['kartu' => [
             ['Kendaraan', $totalKendaraan],
             ['Tersedia', $tersedia],
+            ['Tidak tersedia', $tidakTersedia],
             ['Sedang dipakai', $dipakai],
             ['Sedang perbaikan', $diservis],
             ['STNK jatuh tempo 30 hari', $stnkTempo, $kuning],

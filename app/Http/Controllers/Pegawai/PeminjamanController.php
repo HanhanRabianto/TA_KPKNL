@@ -7,6 +7,7 @@ use App\Models\Kendaraan;
 use App\Models\Peminjaman;
 use App\Models\Pengemudi;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -16,6 +17,7 @@ use Illuminate\View\View;
 class PeminjamanController extends Controller
 {
     private const FILTER_AJUAN = ['all', 'menunggu', 'disetujui', 'ditolak'];
+
     private const FILTER_KEMBALI = ['all', 'belum', 'verifikasi', 'selesai', 'ditolak'];
 
     // Riwayat Saya: pengajuan dan pengembalian dalam satu halaman
@@ -30,7 +32,7 @@ class PeminjamanController extends Controller
             ->get();
 
         return view('pegawai.peminjaman.index', [
-            'pengajuan'    => $semua->filter(fn ($l) => $fa === 'all' || $l->status_pengajuan === $fa)->values(),
+            'pengajuan' => $semua->filter(fn ($l) => $fa === 'all' || $l->status_pengajuan === $fa)->values(),
             'pengembalian' => $semua->filter(fn ($l) => $l->status_pengajuan === 'disetujui' && $l->kendaraan_id
                 && ($fk === 'all' || $l->status_pengembalian === $fk))->values(),
             'fa' => $fa,
@@ -41,6 +43,7 @@ class PeminjamanController extends Controller
     public function create(Request $request): View
     {
         $uid = $request->user()->id;
+        $reservasiSeksiLain = $this->peminjamanAktifSeksiLain($request->user()->nama_seksi);
 
         // "Ajukan ulang" dari pengajuan yang ditolak: isi form dengan data lama
         $isi = null;
@@ -50,36 +53,42 @@ class PeminjamanController extends Controller
 
         return view('pegawai.peminjaman.form', [
             'penghalang' => Peminjaman::penghalang($uid),
-            'isi'        => $isi,
+            'isi' => $isi,
             // seksi memilih sendiri kendaraan dan pengemudi (hanya yang tersedia)
-            'kendaraan'  => Kendaraan::where('status', 'Tersedia')->orderBy('plat')->get(),
-            'pengemudi'  => Pengemudi::where('status', 'Tersedia')->orderBy('nama')->get(),
+            'kendaraan' => Kendaraan::where('status', 'Tersedia')
+                ->whereNotIn('id', (clone $reservasiSeksiLain)->whereNotNull('kendaraan_id')->select('kendaraan_id'))
+                ->orderBy('plat')
+                ->get(),
+            'pengemudi' => Pengemudi::where('status', 'Tersedia')
+                ->whereNotIn('id', (clone $reservasiSeksiLain)->whereNotNull('pengemudi_id')->select('pengemudi_id'))
+                ->orderBy('nama')
+                ->get(),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'kendaraan_id'  => ['required', 'exists:kendaraan,id'],
-            'pengemudi_id'  => ['nullable', 'exists:pengemudi,id'],
+            'kendaraan_id' => ['required', 'exists:kendaraan,id'],
+            'pengemudi_id' => ['nullable', 'exists:pengemudi,id'],
             'lokasi_tujuan' => ['required', 'in:Dalam kota,Luar kota'],
-            'menginap'      => ['required', 'in:0,1'],
-            'tujuan'        => ['required', 'string', 'max:255'],
-            'petugas'       => ['required', 'string', 'max:100'],
-            'penumpang'     => ['required', 'integer', 'min:1', 'max:60'],
-            'catatan'       => ['nullable', 'string', 'max:1000'],
+            'menginap' => ['required', 'in:0,1'],
+            'tujuan' => ['required', 'string', 'max:255'],
+            'petugas' => ['required', 'string', 'max:100'],
+            'penumpang' => ['required', 'integer', 'min:1', 'max:60'],
+            'catatan' => ['nullable', 'string', 'max:1000'],
             'tanggal_mulai' => ['required', 'date', 'after_or_equal:today'],
-            'jam_mulai'     => ['required', 'date_format:H:i'],
+            'jam_mulai' => ['required', 'date_format:H:i'],
         ], [
-            'kendaraan_id.required'        => 'Pilih kendaraan yang tersedia.',
-            'tujuan.required'              => 'Tujuan perjalanan wajib diisi.',
-            'petugas.required'             => 'Nama pegawai yang bertugas wajib diisi.',
-            'penumpang.required'           => 'Jumlah penumpang wajib diisi.',
-            'penumpang.min'                => 'Jumlah penumpang minimal 1.',
-            'tanggal_mulai.required'       => 'Tanggal mulai wajib diisi.',
+            'kendaraan_id.required' => 'Pilih kendaraan yang tersedia.',
+            'tujuan.required' => 'Tujuan perjalanan wajib diisi.',
+            'petugas.required' => 'Nama pegawai yang bertugas wajib diisi.',
+            'penumpang.required' => 'Jumlah penumpang wajib diisi.',
+            'penumpang.min' => 'Jumlah penumpang minimal 1.',
+            'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
             'tanggal_mulai.after_or_equal' => 'Tanggal mulai tidak boleh sebelum hari ini.',
-            'jam_mulai.required'           => 'Jam mulai wajib diisi.',
-            'jam_mulai.date_format'        => 'Format jam mulai tidak valid.',
+            'jam_mulai.required' => 'Jam mulai wajib diisi.',
+            'jam_mulai.date_format' => 'Format jam mulai tidak valid.',
         ]);
 
         // tanggal dan jam digabung menjadi satu kolom waktu mulai
@@ -89,10 +98,11 @@ class PeminjamanController extends Controller
         $data['menginap'] = (bool) $data['menginap'];
 
         $uid = $request->user()->id;
+        $namaSeksi = $request->user()->nama_seksi;
 
         // Semua aturan dicek di dalam transaksi supaya dua pengajuan bersamaan
-        // tidak bisa melewati batas maksimal atau memilih kendaraan yang sama.
-        $hasil = DB::transaction(function () use ($uid, $data) {
+        // tidak bisa melewati batas maksimal atau memilih kendaraan/pengemudi yang sama.
+        $hasil = DB::transaction(function () use ($uid, $namaSeksi, $data) {
             User::whereKey($uid)->lockForUpdate()->first();
 
             if ($alasan = Peminjaman::alasanBlokir($uid)) {
@@ -103,6 +113,9 @@ class PeminjamanController extends Controller
             if ($k->status !== 'Tersedia') {
                 return 'Pilih kendaraan yang tersedia.';
             }
+            if ($this->peminjamanAktifSeksiLain($namaSeksi)->where('kendaraan_id', $k->id)->exists()) {
+                return 'Kendaraan ini sudah diajukan oleh seksi lain. Silakan pilih kendaraan lain.';
+            }
             if ($k->kapasitas < $data['penumpang']) {
                 return 'Kapasitas kendaraan kurang dari jumlah penumpang.';
             }
@@ -111,6 +124,9 @@ class PeminjamanController extends Controller
                 $s = Pengemudi::whereKey($data['pengemudi_id'])->lockForUpdate()->first();
                 if ($s->status !== 'Tersedia') {
                     return 'Pengemudi yang Anda pilih sedang bertugas. Silakan pilih pengemudi lain.';
+                }
+                if ($this->peminjamanAktifSeksiLain($namaSeksi)->where('pengemudi_id', $s->id)->exists()) {
+                    return 'Pengemudi ini sudah diajukan oleh seksi lain. Silakan pilih pengemudi lain.';
                 }
             }
 
@@ -124,5 +140,11 @@ class PeminjamanController extends Controller
         }
 
         return redirect()->route('pegawai.peminjaman.index')->with('ok', 'Pengajuan terkirim, menunggu persetujuan.');
+    }
+
+    private function peminjamanAktifSeksiLain(string $namaSeksi): Builder
+    {
+        return Peminjaman::whereIn('status', Peminjaman::STATUS_AKTIF)
+            ->whereHas('pengguna', fn (Builder $query) => $query->where('nama_seksi', '!=', $namaSeksi));
     }
 }

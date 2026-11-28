@@ -2,7 +2,7 @@
 @section('judul', 'Data Kendaraan')
 
 @php
-    $opsiStatus = ['' => 'Semua status', 'Tersedia' => 'Tersedia', 'Sedang dipakai' => 'Dipakai', 'Sedang diservis' => 'Sedang diservis', 'Rusak' => 'Rusak'];
+    $opsiStatus = ['' => 'Semua status', 'Tersedia' => 'Tersedia', 'Tidak tersedia' => 'Tidak tersedia', 'Sedang dipakai' => 'Dipakai', 'Sedang diservis' => 'Sedang diservis', 'Rusak' => 'Rusak'];
 @endphp
 
 @section('isi')
